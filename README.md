@@ -28,6 +28,19 @@ On Windows, double-click `start.bat`.
 | `ADMIN_USER` | `admin` | Admin username |
 | `ADMIN_PASSWORD` | `admin123` | Admin password, **change this** |
 
+## Load test data
+
+Drag a member file such as `daily_logs_2026-08-19.xlsx` onto `seed.bat`, or run:
+
+```
+npm run seed -- daily_logs_2026-08-19.xlsx
+npm run seed -- daily_logs_2026-08-19.xlsx --demo-logs 2026-08-19   # also add sample visits
+npm run seed -- daily_logs_2026-08-19.xlsx --reset                  # wipe members and logs first
+```
+
+`--demo-logs` adds random visits on that date, some left open, so peak time,
+auto-exit and the CSV report can be tested. Use `--reset` before going live.
+
 ## Admin
 
 - **Import members** from `.xlsx` or `.csv` with columns `full_reg_no, name, branch, year, role`

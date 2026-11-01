@@ -120,3 +120,20 @@ test('import upserts members and reports bad rows', async () => {
   assert.deepEqual(r.skipped.map((s) => s.row), [3, 5, 6]);
   assert.equal(db.prepare("SELECT name FROM members WHERE full_reg_no='20070'").get().name, 'HERO Updated');
 });
+
+test('import reads the Daily Logs sheet layout with a blank column', async () => {
+  const ExcelJS = require('exceljs');
+  const wb = new ExcelJS.Workbook();
+  const sheet = wb.addWorksheet('Daily Logs');
+  sheet.addRow(['full_reg_no', 'name', 'branch', 'year', null, 'entry_date', 'entry_time', 'exit_date', 'exit_time', 'role']);
+  sheet.addRow(['2026/29917', 'Yuvraj Soni', 'B.Tech. (Mechanical)', 'FET2026-2027', null, null, null, null, null, 'Student']);
+  sheet.addRow(['2026/29313', 'Rahul Beniwal', 'B.Tech. (Mechanical)', 'FET2026-2027', null, null, null, null, null, 'Student']);
+
+  const db = openDb(':memory:');
+  const r = await importMembers(db, Buffer.from(await wb.xlsx.writeBuffer()), 'daily_logs_2026-08-19.xlsx');
+  assert.deepEqual(r, { added: 2, updated: 0, skipped: [] });
+  const m = db.prepare("SELECT * FROM members WHERE full_reg_no = '2026/29313'").get();
+  assert.equal(m.name, 'Rahul Beniwal');
+  assert.equal(m.year, 'FET2026-2027');
+  assert.equal(m.role, 'Student');
+});

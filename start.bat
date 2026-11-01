@@ -11,7 +11,7 @@ if not exist node_modules (
 
 REM === Step 2: Start the server ===
 echo Starting library server...
-start "Library Server" cmd /k "node server.js"
+start "Library Server" cmd /k "node --disable-warning=ExperimentalWarning server.js"
 
 REM === Step 3: Wait 3 seconds ===
 timeout /t 3 >nul
