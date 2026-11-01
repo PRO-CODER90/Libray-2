@@ -30,17 +30,29 @@ html, body { margin: 0; min-height: 100%; }
 body {
   font-family: var(--sans);
   color: var(--text-primary);
-  background-color: var(--navy-900);
-  /* Campus photo goes at public/assets/campus.jpg; without it the page is plain navy. */
-  background-image:
-    linear-gradient(90deg, rgba(10,22,51,.95) 0%, rgba(10,22,51,.6) 50%, rgba(10,22,51,.85) 100%),
-    url("assets/campus.jpg");
-  background-size: cover;
-  background-position: 62% center;
-  background-attachment: fixed;
+  background: radial-gradient(ellipse at 65% 30%, var(--navy-700) 0%, var(--navy-900) 70%) fixed var(--navy-900);
+}
+
+/* Campus photo (public/assets/campus.jpg), sitting centre-right behind the
+   hero and faded into the navy at every edge. Without it the page is plain navy. */
+body::before {
+  content: "";
+  position: fixed;
+  z-index: 0;
+  left: 26vw; top: 6vh;
+  width: 66vw; height: 72vh;
+  background:
+    linear-gradient(180deg, rgba(10,22,51,.55) 0%, rgba(10,22,51,.15) 35%, rgba(10,22,51,.35) 100%),
+    url("assets/campus.jpg") center 35% / cover no-repeat;
+  filter: brightness(.82) saturate(1.05);
+  -webkit-mask-image: radial-gradient(ellipse 50% 50% at 50% 50%, #000 55%, transparent 100%);
+  mask-image: radial-gradient(ellipse 50% 50% at 50% 50%, #000 55%, transparent 100%);
+  pointer-events: none;
 }
 
 .page {
+  position: relative;
+  z-index: 1;
   min-height: 100vh;
   padding: 1.6rem 4.2rem 1.6rem 6.9rem;
   display: flex;
@@ -215,6 +227,7 @@ body {
 
 @media (max-width: 767px) {
   html { font-size: 12px; }
+  body::before { left: 0; top: 0; width: 100vw; height: 45vh; opacity: .6; }
   .page { padding: 1.2rem; gap: 1.2rem; }
   .hero h1 { font-size: 3.2rem; }
   .tagline { font-size: 1.5rem; }

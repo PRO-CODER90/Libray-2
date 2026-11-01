@@ -42,12 +42,12 @@ starts the server and opens the browser. Close the "Library Server" window to st
 
 ## Home page images
 
-Put these files in `public/assets/` (they aren't in the repo):
+Images live in `public/assets/`. `campus.jpg` is included; add the logos when available:
 
 | File | Used for | If missing |
 |---|---|---|
 | `logo.png` | University logo in the header | Gold "PU" shield |
-| `campus.jpg` | Background photo (at least 1920×1080) | Plain navy |
+| `campus.jpg` | Building photo behind the hero | Plain navy |
 | `partner.png` | "Official Academic Partner" logo | Partner block hidden |
 
 ## Deploy to Vercel (testing phase)
