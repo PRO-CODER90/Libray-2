@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Poornima University Library</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <h1>POORNIMA UNIVERSITY LIBRARY</h1>
+    <div class="clock">
+      <div id="clock-date" class="clock-date">&nbsp;</div>
+      <div id="clock-time" class="clock-time">&nbsp;</div>
+    </div>
+  </header>
+
+  <main class="home">
+    <form id="entry-form" class="entry card" autocomplete="off">
+      <label for="reg-no">Enter Enrollment / Employee No.</label>
+      <div class="entry-row">
+        <input id="reg-no" name="reg_no" type="text" inputmode="text" maxlength="40" autofocus
+               placeholder="e.g. 2026/29917">
+        <button id="go" type="submit">GO</button>
+      </div>
+    </form>
+
+    <section class="summary">
+      <div class="card stat">
+        <span class="stat-label">In Library</span>
+        <span id="stat-inside" class="stat-value">–</span>
+      </div>
+      <div class="card stat">
+        <span class="stat-label">Peak Time (Today)</span>
+        <span id="stat-peak" class="stat-value small">–</span>
+        <span id="stat-peak-overall" class="stat-sub"></span>
+      </div>
+      <div class="card stat">
+        <span class="stat-label">Library Timings</span>
+        <span class="stat-value small">Open <span id="stat-open">–</span></span>
+        <span class="stat-value small">Close <span id="stat-close">–</span></span>
+      </div>
+    </section>
+
+    <section class="card inside">
+      <h2>Currently Inside <span id="inside-count" class="muted"></span></h2>
+      <ul id="inside-list" class="inside-list"></ul>
+      <p id="inside-empty" class="muted" hidden>Nobody is in the library right now.</p>
+    </section>
+  </main>
+
+  <div id="toast" class="toast" role="status" aria-live="assertive" hidden></div>
+
+  <footer class="foot"><a href="admin.html">Admin</a></footer>
+
+  <script src="common.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

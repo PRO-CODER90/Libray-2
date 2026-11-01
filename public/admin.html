@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Library Admin</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <h1>LIBRARY ADMIN</h1>
+    <nav class="admin-nav">
+      <a href="/">Home screen</a>
+      <button id="logout" type="button" class="link" hidden>Log out</button>
+    </nav>
+  </header>
+
+  <main class="admin">
+    <form id="login-form" class="card login" hidden>
+      <h2>Admin Login</h2>
+      <label>Username <input name="username" required autocomplete="username"></label>
+      <label>Password <input name="password" type="password" required autocomplete="current-password"></label>
+      <button type="submit">Log in</button>
+      <p id="login-error" class="error-text" hidden></p>
+    </form>
+
+    <div id="panel" hidden>
+      <section class="card">
+        <h2>Overview</h2>
+        <p id="stats" class="muted"></p>
+      </section>
+
+      <section class="card">
+        <h2>Library Timings</h2>
+        <form id="settings-form" class="inline-form">
+          <label>Opening <input type="time" name="opening_time" required></label>
+          <label>Closing <input type="time" name="closing_time" required></label>
+          <button type="submit">Save</button>
+          <span id="settings-msg" class="muted"></span>
+        </form>
+      </section>
+
+      <section class="card">
+        <h2>Import Members</h2>
+        <p class="muted">Upload a .xlsx or .csv file with columns
+          <code>full_reg_no, name, branch, year, role</code>. Existing members are updated.</p>
+        <form id="import-form" class="inline-form">
+          <input type="file" name="file" accept=".xlsx,.csv" required>
+          <button type="submit">Import</button>
+        </form>
+        <div id="import-result"></div>
+      </section>
+
+      <section class="card">
+        <h2>Daily Logs</h2>
+        <div class="inline-form">
+          <label>Date <input type="date" id="log-date"></label>
+          <button id="download-csv" type="button">Download CSV report</button>
+        </div>
+        <div class="table-wrap">
+          <table id="logs-table">
+            <thead><tr>
+              <th>Reg. No</th><th>Name</th><th>Branch</th><th>Year</th><th>Role</th>
+              <th>Entry</th><th>Exit</th><th>Exit reason</th>
+            </tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <p id="logs-empty" class="muted" hidden>No entries on this date.</p>
+      </section>
+
+      <section class="card">
+        <h2>Entries by Hour</h2>
+        <p id="peak-label" class="muted"></p>
+        <div id="chart" class="chart"></div>
+      </section>
+    </div>
+  </main>
+
+  <script src="common.js"></script>
+  <script src="admin.js"></script>
+</body>
+</html>
