@@ -23,7 +23,8 @@ npm install
 npm start
 ```
 
-On Windows, double-click `start.bat`.
+On Windows, double-click `start.bat`. It checks Node.js, installs dependencies on first run,
+starts the server and opens the browser. Close the "Library Server" window to stop it.
 
 - Home screen: http://localhost:5000
 - Admin panel: http://localhost:5000/admin.html (default `admin` / `admin123`)
@@ -52,13 +53,13 @@ Auto-exit runs whenever the home screen polls (every 5 s), plus a daily Vercel C
 
 ## Switch back to offline SQLite (final setup)
 
-1. Double-click `pull-db.bat` and paste the Turso URL and token. It copies all members, logs and
+1. Run `start.bat pull` from a command prompt and paste the Turso URL and token. It copies all members, logs and
    timings into `data/library.db` (`npm run pull-db` does the same).
 2. Double-click `start.bat`. The app now runs fully offline on the local SQLite file.
 
 ## Load test data
 
-Drag a member file such as `daily_logs_2026-08-19.xlsx` onto `seed.bat`, or run:
+Drag a member file such as `daily_logs_2026-08-19.xlsx` onto `start.bat`, or run:
 
 ```
 npm run seed -- daily_logs_2026-08-19.xlsx
