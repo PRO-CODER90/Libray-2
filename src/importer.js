@@ -1,7 +1,9 @@
 const ExcelJS = require('exceljs');
 const { parseCsv } = require('./csv');
-const { transaction } = require('./db');
 const { normalizeRegNo, isValidRegNo } = require('./library');
+
+// Rows per database batch, to keep each request to a hosted database small.
+const IMPORT_CHUNK = 500;
 
 const HEADER_ALIASES = {
   full_reg_no: ['full_reg_no', 'reg_no', 'enrollment_no', 'employee_no', 'enrollment', 'registration_no'],
@@ -75,20 +77,18 @@ async function importMembers(db, buffer, filename) {
     valid.push({ regNo, name, branch: cell(row, 'branch') || null, year: cell(row, 'year') || null, role });
   });
 
-  let added = 0;
-  let updated = 0;
-  transaction(db, () => {
-    const exists = db.prepare('SELECT 1 FROM members WHERE full_reg_no = ?');
-    const upsert = db.prepare(`
-      INSERT INTO members (full_reg_no, name, branch, year, role) VALUES (?, ?, ?, ?, ?)
-      ON CONFLICT(full_reg_no) DO UPDATE SET
-        name = excluded.name, branch = excluded.branch, year = excluded.year, role = excluded.role
-    `);
-    for (const m of valid) {
-      if (exists.get(m.regNo)) updated++; else added++;
-      upsert.run(m.regNo, m.name, m.branch, m.year, m.role);
-    }
-  });
+  const existing = new Set((await db.all('SELECT full_reg_no FROM members')).map((r) => r.full_reg_no));
+  const updated = valid.filter((m) => existing.has(m.regNo)).length;
+  const added = valid.length - updated;
+  const upsert = `
+    INSERT INTO members (full_reg_no, name, branch, year, role) VALUES (?, ?, ?, ?, ?)
+    ON CONFLICT(full_reg_no) DO UPDATE SET
+      name = excluded.name, branch = excluded.branch, year = excluded.year, role = excluded.role`;
+  for (let i = 0; i < valid.length; i += IMPORT_CHUNK) {
+    await db.batch(valid.slice(i, i + IMPORT_CHUNK).map((m) => ({
+      sql: upsert, args: [m.regNo, m.name, m.branch, m.year, m.role],
+    })));
+  }
 
   return { added, updated, skipped };
 }
