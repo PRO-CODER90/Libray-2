@@ -4,54 +4,98 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Poornima University Library</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600&display=swap">
+  <link rel="stylesheet" href="home.css">
 </head>
 <body>
-  <header class="topbar">
-    <h1>POORNIMA UNIVERSITY LIBRARY</h1>
-    <div class="clock">
-      <div id="clock-date" class="clock-date">&nbsp;</div>
-      <div id="clock-time" class="clock-time">&nbsp;</div>
-    </div>
-  </header>
+  <!-- Icon sprite (Lucide-style line icons) -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></symbol>
+    <symbol id="i-id" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><circle cx="8" cy="12" r="2.5"/><path d="M14 10h5M14 14h3"/></symbol>
+    <symbol id="i-book" viewBox="0 0 24 24"><path d="M2 4h6a4 4 0 0 1 4 4v13a3 3 0 0 0-3-3H2zM22 4h-6a4 4 0 0 0-4 4v13a3 3 0 0 1 3-3h7z"/></symbol>
+    <symbol id="i-bars" viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M8 17v-5M13 17V8M18 17v-8"/></symbol>
+    <symbol id="i-users" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
+    <symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></symbol>
+  </svg>
 
-  <main class="home">
-    <form id="entry-form" class="entry card" autocomplete="off">
-      <label for="reg-no">Enter Enrollment / Employee No.</label>
-      <div class="entry-row">
-        <input id="reg-no" name="reg_no" type="text" inputmode="text" maxlength="40" autofocus
-               placeholder="e.g. 2026/29917">
-        <button id="go" type="submit">GO</button>
+  <div class="page">
+    <header class="header">
+      <div class="brand">
+        <span class="logo">
+          <!-- Drop the university logo at public/assets/logo.png -->
+          <img src="assets/logo.png" alt="Poornima University" onerror="this.remove()">
+          <span class="logo-fallback" aria-hidden="true">PU</span>
+        </span>
+        <span class="wordmark">POORNIMA<br>UNIVERSITY</span>
+        <span class="divider"></span>
+        <svg class="icon gold"><use href="#i-book"/></svg>
+        <span class="library-caps">LIBRARY</span>
       </div>
+      <!-- Shown only when public/assets/partner.png exists -->
+      <div class="partner" hidden>
+        <span class="partner-caps">OFFICIAL<br>ACADEMIC PARTNER</span>
+        <span class="divider"></span>
+        <img id="partner-logo" src="assets/partner.png" alt="Academic partner">
+      </div>
+    </header>
+
+    <section class="hero">
+      <div class="hero-text">
+        <h1>Poornima University<br>Library</h1>
+        <span class="rule"></span>
+        <p class="tagline">A Central Hub for Learning,<br>Research and Innovation.</p>
+      </div>
+      <div class="glass clock-card">
+        <div class="clock-row"><svg class="icon gold"><use href="#i-calendar"/></svg><span id="clock-date">&nbsp;</span></div>
+        <div class="clock-row"><svg class="icon gold"><use href="#i-clock"/></svg><span id="clock-time" class="tabular">&nbsp;</span></div>
+      </div>
+    </section>
+
+    <form id="entry-form" class="glass entry" autocomplete="off">
+      <label for="reg-no" class="entry-label"><svg class="icon gold"><use href="#i-id"/></svg>
+        <span>Enter Enrollment /<br>Employee No.</span></label>
+      <input id="reg-no" name="reg_no" type="text" maxlength="40" autofocus placeholder="e.g. 2026/29917">
+      <button id="go" type="submit">GO</button>
     </form>
 
-    <section class="summary">
-      <div class="card stat">
-        <span class="stat-label">In Library</span>
-        <span id="stat-inside" class="stat-value">–</span>
+    <section class="stats">
+      <div class="glass stat">
+        <span class="tile"><svg class="icon gold"><use href="#i-book"/></svg></span>
+        <div><span class="stat-label">In Library</span><span id="stat-inside" class="stat-value big tabular">0</span></div>
       </div>
-      <div class="card stat">
-        <span class="stat-label">Peak Time (Today)</span>
-        <span id="stat-peak" class="stat-value small">–</span>
-        <span id="stat-peak-overall" class="stat-sub"></span>
+      <div class="glass stat">
+        <span class="tile"><svg class="icon gold"><use href="#i-bars"/></svg></span>
+        <div><span class="stat-label">Peak Time (Today)</span><span id="stat-peak" class="stat-value">No entries yet</span></div>
       </div>
-      <div class="card stat">
-        <span class="stat-label">Library Timings</span>
-        <span class="stat-value small">Open <span id="stat-open">–</span></span>
-        <span class="stat-value small">Close <span id="stat-close">–</span></span>
+      <div class="glass stat">
+        <span class="tile"><svg class="icon gold"><use href="#i-clock"/></svg></span>
+        <div>
+          <span class="stat-label">Library Timings</span>
+          <span class="stat-value">Open <span id="stat-open">–</span></span>
+          <span class="stat-value">Close <span id="stat-close">–</span></span>
+        </div>
       </div>
     </section>
 
-    <section class="card inside">
-      <h2>Currently Inside <span id="inside-count" class="muted"></span></h2>
-      <ul id="inside-list" class="inside-list"></ul>
-      <p id="inside-empty" class="muted" hidden>Nobody is in the library right now.</p>
-    </section>
-  </main>
+    <footer class="bottom">
+      <section class="glass inside">
+        <div class="inside-title"><svg class="icon gold"><use href="#i-users"/></svg><strong>Currently Inside</strong></div>
+        <span class="divider"></span>
+        <div class="inside-body">
+          <p id="inside-empty">Nobody is in the library right now.</p>
+          <ul id="inside-list" class="chips"></ul>
+        </div>
+      </section>
+      <a class="admin-link" href="admin.html"><svg class="icon"><use href="#i-gear"/></svg>Admin</a>
+    </footer>
+  </div>
 
-  <div id="toast" class="toast" role="status" aria-live="assertive" hidden></div>
-
-  <footer class="foot"><a href="admin.html">Admin</a></footer>
+  <div id="toast-backdrop" class="toast-backdrop" hidden>
+    <div id="toast" class="toast" role="status" aria-live="assertive"></div>
+  </div>
 
   <script src="common.js"></script>
   <script src="app.js"></script>

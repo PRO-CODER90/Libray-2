@@ -1,9 +1,18 @@
 const form = document.getElementById('entry-form');
 const input = document.getElementById('reg-no');
 const goBtn = document.getElementById('go');
+const backdrop = document.getElementById('toast-backdrop');
 const toast = document.getElementById('toast');
 
-// ---- Live clock (always IST, rolls over at midnight on its own) ----
+// ---- Partner logo: show the block only if the image exists ----
+
+const partnerLogo = document.getElementById('partner-logo');
+partnerLogo.addEventListener('load', () => { partnerLogo.closest('.partner').hidden = false; });
+if (partnerLogo.complete && partnerLogo.naturalWidth) partnerLogo.closest('.partner').hidden = false;
+
+// ---- Live clock: IST, offset to the server clock, rolls over at midnight ----
+
+let clockOffset = 0; // server time minus browser time, in ms
 
 const dateFmt = new Intl.DateTimeFormat('en-IN', {
   timeZone: TZ, weekday: 'long', day: 'numeric', month: 'short', year: 'numeric',
@@ -13,7 +22,7 @@ const timeFmt = new Intl.DateTimeFormat('en-IN', {
 });
 
 function renderClock() {
-  const now = new Date();
+  const now = new Date(Date.now() + clockOffset);
   const parts = dateFmt.formatToParts(now);
   const get = (t) => parts.find((p) => p.type === t)?.value;
   document.getElementById('clock-date').textContent =
@@ -26,13 +35,14 @@ setInterval(renderClock, 1000);
 // ---- Pop-up ----
 
 let toastTimer;
-function showToast(message, type) {
+function showToast(message, kind) {
   toast.textContent = message;
-  toast.className = `toast toast-${type}`;
-  toast.hidden = false;
+  toast.className = `toast toast-${kind}`;
+  backdrop.hidden = false;
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => { toast.hidden = true; }, 3000);
+  toastTimer = setTimeout(() => { backdrop.hidden = true; }, 3000);
 }
+backdrop.addEventListener('click', () => { backdrop.hidden = true; input.focus(); });
 
 // ---- Entry / exit ----
 
@@ -49,7 +59,7 @@ form.addEventListener('submit', async (e) => {
     const { body } = await api('/api/entry', {
       method: 'POST', body: JSON.stringify({ reg_no: regNo }),
     });
-    showToast(body.message || 'Something went wrong', body.type || 'error');
+    showToast(body.message || 'Something went wrong', body.action === 'exit' ? 'exit' : body.type || 'error');
     refresh();
   } catch {
     showToast('Cannot reach the server', 'error');
@@ -70,8 +80,13 @@ window.addEventListener('focus', () => input.focus());
 
 async function refresh() {
   try {
+    const sent = Date.now();
     const [status, inside] = await Promise.all([api('/api/status'), api('/api/inside')]);
-    if (status.ok) renderStatus(status.body);
+    if (status.ok) {
+      const latency = (Date.now() - sent) / 2;
+      clockOffset = new Date(status.body.server_time).getTime() + latency - Date.now();
+      renderStatus(status.body);
+    }
     if (inside.ok) renderInside(inside.body);
   } catch { /* try again on next poll */ }
 }
@@ -79,21 +94,18 @@ async function refresh() {
 function renderStatus(s) {
   document.getElementById('stat-inside').textContent = s.inside;
   document.getElementById('stat-peak').textContent = s.peak_today ? s.peak_today.label : 'No entries yet';
-  document.getElementById('stat-peak-overall').textContent =
-    s.peak_overall ? `Overall: ${s.peak_overall.label}` : '';
   document.getElementById('stat-open').textContent = s.opening_label;
   document.getElementById('stat-close').textContent = s.closing_label;
 }
 
 function renderInside(list) {
-  const ul = document.getElementById('inside-list');
-  ul.replaceChildren(...list.map((m) => el('li', {},
-    el('span', { className: 'in-name', textContent: m.name }),
-    el('span', { className: 'in-branch', textContent: [m.branch, m.role].filter(Boolean).join(' · ') }),
-    el('span', { className: 'in-time', textContent: formatTime12(m.entry_time) }),
+  document.getElementById('inside-list').replaceChildren(...list.map((m) => el('li', {
+    title: [m.branch, m.role].filter(Boolean).join(' · '),
+  },
+  el('span', { textContent: m.name }),
+  el('span', { className: 'chip-time', textContent: ` · ${formatTime12(m.entry_time)}` }),
   )));
   document.getElementById('inside-empty').hidden = list.length > 0;
-  document.getElementById('inside-count').textContent = list.length ? `(${list.length})` : '';
 }
 
 refresh();

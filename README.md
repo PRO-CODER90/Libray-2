@@ -40,6 +40,16 @@ starts the server and opens the browser. Close the "Library Server" window to st
 | `SESSION_SECRET` | derived from admin login | Signs admin login cookies |
 | `CRON_SECRET` | – | Protects `/api/cron/auto-exit` |
 
+## Home page images
+
+Put these files in `public/assets/` (they aren't in the repo):
+
+| File | Used for | If missing |
+|---|---|---|
+| `logo.png` | University logo in the header | Gold "PU" shield |
+| `campus.jpg` | Background photo (at least 1920×1080) | Plain navy |
+| `partner.png` | "Official Academic Partner" logo | Partner block hidden |
+
 ## Deploy to Vercel (testing phase)
 
 1. Create a database at [turso.tech](https://turso.tech) and copy its URL (`libsql://...`) and an auth token.
