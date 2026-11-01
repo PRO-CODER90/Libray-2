@@ -30,34 +30,9 @@ html, body { margin: 0; min-height: 100%; }
 body {
   font-family: var(--sans);
   color: var(--text-primary);
-  background-color: #0B1F52;
-  /* Royal-blue night sky with a sunset glow behind the building. */
-  background-image:
-    radial-gradient(ellipse 55% 30% at 62% 34%, rgba(205, 110, 175, .5) 0%, rgba(125, 80, 180, .28) 45%, transparent 78%),
-    radial-gradient(ellipse 38% 14% at 64% 45%, rgba(255, 165, 105, .38) 0%, transparent 72%),
-    linear-gradient(180deg, #0D2058 0%, #13307A 38%, #0E2A6E 60%, #0A2260 100%);
-  background-attachment: fixed;
-}
-
-/* Library building at dusk (public/assets/campus.jpg), centre-right behind
-   the hero, fading into the sky at its edges. Sized in rem like the rest of
-   the layout and centred where the reference design has it (58% across). */
-.page::before {
-  content: "";
-  position: absolute;
-  z-index: -1;
-  left: calc(58% - 18.75rem); top: 5.65rem;
-  width: 37.5rem; height: 22.6rem;
-  background: url("assets/campus.jpg") center bottom / cover no-repeat;
-  -webkit-mask-image:
-    linear-gradient(90deg, transparent 0%, #000 9%, #000 91%, transparent 100%),
-    linear-gradient(180deg, transparent 0%, #000 22%, #000 94%, transparent 100%);
-  -webkit-mask-composite: source-in;
-  mask-image:
-    linear-gradient(90deg, transparent 0%, #000 9%, #000 91%, transparent 100%),
-    linear-gradient(180deg, transparent 0%, #000 22%, #000 94%, transparent 100%);
-  mask-composite: intersect;
-  pointer-events: none;
+  /* Full-page dusk scene (public/assets/campus.jpg), laid out to line up with
+     the page at 16:9; other shapes crop it around the centre. */
+  background: #0B1F52 url("assets/campus.jpg") center / cover no-repeat fixed;
 }
 
 .page {
@@ -237,15 +212,18 @@ body {
   .hero { flex-direction: column; }
   .hero-text { padding-left: 0; }
   .clock-card { margin: 0; min-width: 0; }
-  .page::before { left: auto; right: 0; top: 5rem; width: 34rem; height: 20.5rem; opacity: .8; }
   .entry, .stats, .bottom { margin: 0; }
   .admin-link { margin: 0 0 0 2rem; }
 }
 
 @media (max-width: 767px) {
   html { font-size: 12px; }
-  .page::before { left: 0; right: 0; top: 5.5rem; width: auto; height: 22rem; opacity: .35; }
   .partner img { height: 3.4rem; }
+  body {
+    background:
+      linear-gradient(180deg, rgba(11, 31, 82, .55), rgba(11, 31, 82, .75) 45vh, #0B1F52 60vh) fixed,
+      #0B1F52 url("assets/campus.jpg") 58% top / auto 60vh no-repeat fixed;
+  }
   .page { padding: 1.2rem; gap: 1.2rem; }
   .hero h1 { font-size: 3.2rem; }
   .tagline { font-size: 1.5rem; }
