@@ -1,10 +1,13 @@
 const loginForm = document.getElementById('login-form');
+const loginView = document.getElementById('login-view');
+const topbar = document.querySelector('.topbar');
 const panel = document.getElementById('panel');
 const logoutBtn = document.getElementById('logout');
 const logDate = document.getElementById('log-date');
 
 function showPanel(loggedIn) {
-  loginForm.hidden = loggedIn;
+  loginView.hidden = loggedIn;
+  topbar.hidden = !loggedIn;
   panel.hidden = !loggedIn;
   logoutBtn.hidden = !loggedIn;
   if (loggedIn) loadAll();
@@ -24,6 +27,15 @@ loginForm.addEventListener('submit', async (e) => {
   err.hidden = ok;
   err.textContent = body.message || '';
   if (ok) { loginForm.reset(); showPanel(true); }
+});
+
+// Show / hide the password.
+document.getElementById('toggle-password').addEventListener('click', (e) => {
+  const field = loginForm.password;
+  const show = field.type === 'password';
+  field.type = show ? 'text' : 'password';
+  e.currentTarget.setAttribute('aria-label', show ? 'Hide password' : 'Show password');
+  e.currentTarget.querySelector('use').setAttribute('href', show ? '#i-eye-off' : '#i-eye');
 });
 
 logoutBtn.addEventListener('click', async () => {
