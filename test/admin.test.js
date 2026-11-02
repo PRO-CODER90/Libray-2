@@ -10,6 +10,7 @@ const { openDb } = require('../src/db');
 const lib = require('../src/library');
 const { periodRange } = require('../src/periods');
 const { buildReport, analytics, visitsInRange } = require('../src/reports');
+const { importMembers } = require('../src/importer');
 const { createBackups } = require('../src/backup');
 const { createApp } = require('../src/app');
 const { passwordProblems, MAX_FAILS } = require('../src/auth');
@@ -44,6 +45,8 @@ test('period ranges: day, Monday–Sunday week, calendar month', () => {
   assert.equal(periodRange('day', '2026-13-01'), null);
 });
 
+const LAYOUT = ['full_reg_no', 'name', 'branch', 'year', '', 'entry_date', 'entry_time', 'exit_date', 'exit_time', 'role', 'Reason'];
+
 test('report summary counts and AUTO-LOGOUT only on system-closed visits', async () => {
   const db = await seeded();
   const r = await buildReport(db, { period: 'month', date: '2026-10-15', format: 'csv' });
@@ -53,7 +56,7 @@ test('report summary counts and AUTO-LOGOUT only on system-closed visits', async
   assert.equal(r.summary.auto_logouts, 1);
   assert.equal(r.summary.still_inside, 0);
   assert.equal(r.summary.unique_visitors, 2);
-  assert.equal(r.filename, 'library_report_month_2026-10-01_to_2026-10-31.csv');
+  assert.equal(r.filename, 'daily_logs_2026-10-01_to_2026-10-31.csv');
 
   const rows = await visitsInRange(db, '2026-10-01', '2026-11-30');
   const notes = Object.fromEntries(rows.map((v) => [`${v.full_reg_no}@${v.entry_date}`, v.note]));
@@ -61,28 +64,36 @@ test('report summary counts and AUTO-LOGOUT only on system-closed visits', async
   assert.equal(notes['F1@2026-10-28'], 'AUTO-LOGOUT');
   assert.equal(notes['2026/1@2026-11-02'], '');
 
-  const csv = r.buffer.toString('utf8');
-  assert.match(csv, /role,full_reg_no,name,branch,year,entry_date,entry_time,exit_date,exit_time,note/);
-  assert.match(csv, /"'=HYPERLINK\(""x""\)"/); // formula escaped
+  const lines = r.buffer.toString('utf8').replace(/^﻿/, '').trim().split('\r\n');
+  assert.equal(lines[0], LAYOUT.join(','));
+  assert.equal(lines[1], '2026/1,Asha,CSE,FET2026,,2026-10-28,10:00:00,2026-10-28,11:30:00,Student,');
+  assert.match(lines[2], /^F1,"'=HYPERLINK\(""x""\)",Physics,,,2026-10-28,12:15:00,2026-10-28,17:00:00,Faculty,AUTO-LOGOUT$/);
 });
 
-test('xlsx report has Summary and Details sheets with the detail columns', async () => {
+test('xlsx report is the Daily Logs sheet in the uploaded layout', async () => {
   const db = await seeded();
-  const r = await buildReport(db, { period: 'week', date: '2026-10-28', format: 'xlsx' });
+  const r = await buildReport(db, { period: 'day', date: '2026-10-28', format: 'xlsx' });
+  assert.equal(r.filename, 'daily_logs_2026-10-28.xlsx');
   const wb = new ExcelJS.Workbook();
   await wb.xlsx.load(r.buffer);
-  assert.ok(wb.getWorksheet('Summary'));
-  const ws = wb.getWorksheet('Details');
-  assert.deepEqual(ws.getRow(1).values.slice(1), [
-    'role', 'full_reg_no', 'name', 'branch', 'year', 'entry_date', 'entry_time', 'exit_date', 'exit_time', 'note']);
-  assert.equal(ws.getRow(3).getCell(10).value, 'AUTO-LOGOUT');
-  assert.equal(ws.getRow(3).getCell(3).value, '\'=HYPERLINK("x")');
+  assert.deepEqual(wb.worksheets.map((w) => w.name), ['Daily Logs']);
+  const ws = wb.getWorksheet('Daily Logs');
+  const header = [];
+  for (let c = 1; c <= 11; c++) header.push(ws.getRow(1).getCell(c).value ?? '');
+  assert.deepEqual(header, LAYOUT);
+  assert.equal(ws.getRow(1).getCell(1).font.bold, true);
+  assert.equal(ws.getRow(3).getCell(9).value, '17:00:00');
+  assert.equal(ws.getRow(3).getCell(11).value, 'AUTO-LOGOUT');
+  assert.equal(ws.getRow(2).getCell(11).value, null);
+  assert.equal(ws.rowCount, 3);
 });
 
-test('summary-only report has no names', async () => {
+test('the report layout can be uploaded back as a member list', async () => {
   const db = await seeded();
-  const r = await buildReport(db, { period: 'month', date: '2026-10-01', format: 'csv', summaryOnly: true });
-  assert.doesNotMatch(r.buffer.toString('utf8'), /Asha/);
+  const r = await buildReport(db, { period: 'month', date: '2026-10-01', format: 'xlsx' });
+  const fresh = await openDb({ file: ':memory:' });
+  const result = await importMembers(fresh, r.buffer, r.filename);
+  assert.equal(result.added, 2);
 });
 
 test('analytics buckets by weekday and counts roles and auto-logouts', async () => {

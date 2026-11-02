@@ -320,7 +320,6 @@ $('rp-email-only').addEventListener('click', async (e) => {
 
 const shPicker = createPicker($('sh-picker'));
 const shFormat = () => document.querySelector('input[name="sh-format"]:checked').value;
-const shSummaryOnly = () => document.querySelector('input[name="sh-detail"]:checked').value === 'summary';
 let recipients = [];
 
 async function loadRecipients() {
@@ -379,13 +378,12 @@ $('sh-send').addEventListener('click', async (e) => {
   if (!count) return setMsg($('sh-msg'), 'Pick at least one recipient.', 'err');
   if (extra && !$('sh-extra').checkValidity()) return setMsg($('sh-msg'), 'The other email address is not valid.', 'err');
   const people = await reportSize(v);
-  const what = shSummaryOnly() ? 'a summary (no names)' : `personal data of ${people} students/faculty`;
-  if (!await ask({ title: 'Send report?', text: `This report (${shPicker.label()}) contains ${what}. Send to ${count} recipient${count > 1 ? 's' : ''}?`, okLabel: 'Send' })) return;
+  if (!await ask({ title: 'Send report?', text: `This report (${shPicker.label()}) contains personal data of ${people} students/faculty. Send to ${count} recipient${count > 1 ? 's' : ''}?`, okLabel: 'Send' })) return;
   btn.disabled = true;
   setMsg($('sh-msg'), 'Sending…');
   const { ok, body } = await adminApi('/api/admin/report/share', {
     method: 'POST',
-    body: JSON.stringify({ ...v, format: shFormat(), recipients: ids, extra, note: $('sh-note').value.trim(), summary_only: shSummaryOnly() }),
+    body: JSON.stringify({ ...v, format: shFormat(), recipients: ids, extra, note: $('sh-note').value.trim() }),
   });
   setMsg($('sh-msg'), ok ? `Sent to ${body.sent_to.join(', ')}.` : body.message, ok ? 'ok' : 'err');
   btn.disabled = false;

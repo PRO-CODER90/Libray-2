@@ -159,7 +159,7 @@
             <button type="button" id="rp-email-only" class="btn">Email to admin</button>
           </div>
           <p id="rp-msg" class="msg" role="status"></p>
-          <p class="muted small">Each report has a summary (entries, exits, manual exits, auto-logouts, still inside, unique visitors, students and faculty) and one row per visit. The note column says AUTO-LOGOUT only when the system closed the visit.</p>
+          <p class="muted small">Every report uses the library's Daily Logs layout: full_reg_no, name, branch, year, entry_date, entry_time, exit_date, exit_time, role and Reason. The system fills in the dates and times itself, and Reason says AUTO-LOGOUT only for visitors it logged out at closing time.</p>
         </div>
       </section>
 
@@ -174,11 +174,6 @@
               <legend>Format</legend>
               <label class="pill"><input type="radio" name="sh-format" value="xlsx" checked> Excel</label>
               <label class="pill"><input type="radio" name="sh-format" value="csv"> CSV</label>
-            </fieldset>
-            <fieldset class="row">
-              <legend>Contents</legend>
-              <label class="pill"><input type="radio" name="sh-detail" value="summary" checked> Summary only (no names)</label>
-              <label class="pill"><input type="radio" name="sh-detail" value="full"> Full detail</label>
             </fieldset>
             <fieldset>
               <legend>Recipients</legend>
@@ -249,7 +244,7 @@
           <h2>Daily logs</h2>
           <div class="row">
             <label>Date <input type="date" id="log-date"></label>
-            <button id="download-csv" type="button" class="btn">Quick CSV for this day</button>
+            <button id="download-csv" type="button" class="btn">Download this day (Excel)</button>
           </div>
           <div class="table-wrap">
             <table id="logs-table">

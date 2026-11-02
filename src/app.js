@@ -5,7 +5,6 @@ const { getSettings, setSetting } = require('./db');
 const { dateStr, isValidHHMM, isValidDate, formatClock } = require('./time');
 const library = require('./library');
 const { importMembers } = require('./importer');
-const { toCsv } = require('./csv');
 const { createAuth } = require('./auth');
 const { audit, recentAudit } = require('./audit');
 const { PERIODS } = require('./periods');
@@ -19,11 +18,6 @@ const { runDailyJobs } = require('./jobs');
 // credential lives in the code. Without one, admin login is disabled.
 const DEFAULT_ADMIN_USER = 'PU01A';
 const FORMATS = ['xlsx', 'csv'];
-
-const EXPORT_COLUMNS = [
-  'full_reg_no', 'name', 'branch', 'year', 'entry_date', 'entry_time',
-  'exit_date', 'exit_time', 'role', 'exit_reason',
-];
 
 const CSP = [
   "default-src 'self'",
@@ -235,15 +229,15 @@ function createApp(dbReady, options) {
     res.json(await library.logsForDate(db, date));
   });
 
+  // Quick download of one day, in the same Daily Logs layout.
   app.get('/api/admin/export', auth.requireAdmin, async (req, res) => {
     const date = req.query.date || dateStr();
-    if (!isValidDate(date)) return res.status(400).json({ message: 'Invalid date' });
+    const format = req.query.format || 'xlsx';
+    if (!isValidDate(date) || !validFormat(format)) return res.status(400).json({ message: 'Invalid date' });
     await library.runAutoExit(db);
-    const csv = toCsv(EXPORT_COLUMNS, await library.logsForDate(db, date));
-    await audit(db, 'report_download', `daily csv ${date}`, req.ip);
-    res.setHeader('Content-Type', 'text/csv; charset=utf-8');
-    res.setHeader('Content-Disposition', `attachment; filename="daily_logs_${date}.csv"`);
-    res.send(csv);
+    const report = await buildReport(db, { period: 'day', date, format });
+    await audit(db, 'report_download', `daily ${format} ${date}`, req.ip);
+    sendFile(res, report);
   });
 
   app.get('/api/admin/stats', auth.requireAdmin, async (req, res) => {
@@ -331,7 +325,7 @@ function createApp(dbReady, options) {
 
   // Sends a report to saved recipients (and optionally one extra address).
   app.post('/api/admin/report/share', auth.requireAdmin, async (req, res) => {
-    const { period, date, format = 'xlsx', recipients = [], extra = '', note = '', summary_only: summaryOnly = false } = req.body || {};
+    const { period, date, format = 'xlsx', recipients = [], extra = '', note = '' } = req.body || {};
     if (!validPeriod({ period, date }) || !validFormat(format)) return res.status(400).json({ message: 'Choose a period, a date and a format.' });
     const ids = [].concat(recipients).map(parseId).filter(Boolean).slice(0, 100);
     const saved = ids.length
@@ -345,7 +339,7 @@ function createApp(dbReady, options) {
     }
     if (!to.length) return res.status(400).json({ message: 'Pick at least one recipient.' });
 
-    const report = await buildReport(db, { period, date, format, summaryOnly: Boolean(summaryOnly) });
+    const report = await buildReport(db, { period, date, format });
     const message = cleanText(note, 1000);
     try {
       await sendMail({
@@ -355,7 +349,7 @@ function createApp(dbReady, options) {
           'This report contains personal data for official library use only. Please do not forward it.',
         attachments: [{ filename: report.filename, content: report.buffer }],
       });
-      await audit(db, 'share', `${period} ${report.range.from}..${report.range.to} ${summaryOnly ? 'summary' : 'full'} to ${to.join(', ')}`, req.ip);
+      await audit(db, 'share', `${period} ${report.range.from}..${report.range.to} to ${to.join(', ')}`, req.ip);
       res.json({ ok: true, sent_to: to });
     } catch (err) {
       await audit(db, 'share_fail', err.message, req.ip);
@@ -444,4 +438,4 @@ function appOptionsFromEnv() {
   };
 }
 
-module.exports = { createApp, appOptionsFromEnv, EXPORT_COLUMNS };
+module.exports = { createApp, appOptionsFromEnv };

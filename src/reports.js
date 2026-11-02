@@ -1,15 +1,30 @@
 const ExcelJS = require('exceljs');
-const { toCsv, escapeField } = require('./csv');
+const { escapeField } = require('./csv');
 const { getSettings } = require('./db');
 const { periodRange, eachDate, DAYS } = require('./periods');
 const { hourLabel, hourRangeLabel } = require('./time');
 const { AUTO_EXIT_REASON } = require('./library');
 
 const AUTO_LOGOUT_NOTE = 'AUTO-LOGOUT';
-const DETAIL_COLUMNS = [
-  'role', 'full_reg_no', 'name', 'branch', 'year',
-  'entry_date', 'entry_time', 'exit_date', 'exit_time', 'note',
+
+// The library's own "Daily Logs" sheet: the same layout the staff upload
+// (daily_logs_YYYY-MM-DD.xlsx), including the blank fifth column. Every
+// report file uses exactly this layout and nothing else.
+const SHEET_NAME = 'Daily Logs';
+const TEMPLATE = [
+  { header: 'full_reg_no', key: 'full_reg_no', width: 16.66 },
+  { header: 'name', key: 'name', width: 24.33 },
+  { header: 'branch', key: 'branch', width: 48.55 },
+  { header: 'year', key: 'year', width: 14.55 },
+  { header: '', key: null, width: 18 },
+  { header: 'entry_date', key: 'entry_date', width: 17.78 },
+  { header: 'entry_time', key: 'entry_time', width: 15 },
+  { header: 'exit_date', key: 'exit_date', width: 14.66 },
+  { header: 'exit_time', key: 'exit_time', width: 13.66 },
+  { header: 'role', key: 'role', width: 9 },
+  { header: 'Reason', key: 'note', width: 16 },
 ];
+const DETAIL_COLUMNS = TEMPLATE.map((c) => c.header);
 
 // Every visit whose entry falls in from..to, oldest first.
 async function visitsInRange(db, from, to) {
@@ -62,69 +77,45 @@ const SUMMARY_LINES = [
   ['Faculty', 'faculty'],
 ];
 
-function buildCsv(summary, rows, summaryOnly) {
-  const head = SUMMARY_LINES.map(([label, key]) => `${escapeField(label)},${escapeField(summary[key])}`);
-  if (summaryOnly) return `﻿${head.join('\r\n')}\r\n`;
-  // toCsv adds its own BOM; the file gets one at the very start.
-  return `﻿${head.join('\r\n')}\r\n\r\n${toCsv(DETAIL_COLUMNS, rows).replace(/^﻿/, '')}`;
+// A leading = + - @ is prefixed so a value can't turn into a formula.
+const safeText = (v) => (typeof v === 'string' && /^[=+\-@\t\r]/.test(v) ? `'${v}` : v);
+const cellValues = (r) => TEMPLATE.map((c) => (c.key ? safeText(r[c.key] ?? '') : ''));
+
+function buildCsv(rows) {
+  const lines = [TEMPLATE.map((c) => escapeField(c.header)).join(',')];
+  for (const r of rows) lines.push(cellValues(r).map((v) => escapeField(v)).join(','));
+  return `\uFEFF${lines.join('\r\n')}\r\n`;
 }
 
-// Spreadsheet text is stored as text, but a leading = + - @ is still
-// prefixed so a copied value can't turn into a formula.
-const safeText = (v) => (typeof v === 'string' && /^[=+\-@\t\r]/.test(v) ? `'${v}` : v);
-const asDate = (s) => (s ? new Date(`${s}T00:00:00Z`) : null);
-
-async function buildXlsx(summary, rows, summaryOnly) {
+async function buildXlsx(rows) {
   const wb = new ExcelJS.Workbook();
   wb.creator = 'Poornima University Library';
-
-  const sum = wb.addWorksheet('Summary');
-  sum.columns = [{ header: 'Item', key: 'item', width: 22 }, { header: 'Value', key: 'value', width: 44 }];
-  sum.getRow(1).font = { bold: true };
-  for (const [label, key] of SUMMARY_LINES) sum.addRow({ item: label, value: summary[key] });
-
-  if (!summaryOnly) {
-    const ws = wb.addWorksheet('Details', { views: [{ state: 'frozen', ySplit: 1 }] });
-    ws.columns = DETAIL_COLUMNS.map((key) => ({ header: key, key }));
-    ws.getRow(1).font = { bold: true };
-    for (const r of rows) {
-      const row = ws.addRow({
-        role: r.role, full_reg_no: safeText(r.full_reg_no), name: safeText(r.name),
-        branch: safeText(r.branch), year: safeText(r.year),
-        entry_date: asDate(r.entry_date), entry_time: r.entry_time,
-        exit_date: asDate(r.exit_date), exit_time: r.exit_time, note: r.note,
-      });
-      if (isAuto(r)) {
-        row.getCell('note').fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFDE2E1' } };
-      }
+  const ws = wb.addWorksheet(SHEET_NAME);
+  ws.columns = TEMPLATE.map((c) => ({ width: c.width }));
+  const head = ws.addRow(TEMPLATE.map((c) => c.header || null));
+  const thin = { style: 'thin' };
+  head.eachCell({ includeEmpty: true }, (cell, col) => {
+    cell.font = { bold: true, size: 11, name: 'Calibri', family: 2 };
+    if (col <= 10) {
+      cell.alignment = { horizontal: 'center', vertical: 'top' };
+      cell.border = { left: thin, right: thin, top: thin, bottom: thin };
     }
-    ws.getColumn('entry_date').numFmt = 'yyyy-mm-dd';
-    ws.getColumn('exit_date').numFmt = 'yyyy-mm-dd';
-    const total = ws.addRow({ role: 'Total visits', full_reg_no: rows.length, note: `${summary.auto_logouts} ${AUTO_LOGOUT_NOTE}` });
-    total.font = { bold: true };
-    // Auto-width from the longest value in each column.
-    ws.columns.forEach((col) => {
-      let max = col.header.length;
-      col.eachCell({ includeEmpty: false }, (cell) => {
-        const v = cell.value instanceof Date ? 10 : String(cell.value ?? '').length;
-        if (v > max) max = v;
-      });
-      col.width = Math.min(max + 2, 50);
-    });
-  }
+  });
+  for (const r of rows) ws.addRow(cellValues(r).map((v) => (v === '' ? null : v)));
   return Buffer.from(await wb.xlsx.writeBuffer());
 }
 
-// Builds a report file. Returns null when period/date are invalid.
-async function buildReport(db, { period, date, format = 'xlsx', summaryOnly = false }) {
+// Builds a report file in the Daily Logs layout. Returns null when
+// period/date are invalid.
+async function buildReport(db, { period, date, format = 'xlsx' }) {
   const range = periodRange(period, date);
   if (!range || !['xlsx', 'csv'].includes(format)) return null;
   const rows = await visitsInRange(db, range.from, range.to);
   const summary = summarize(range, rows);
-  const filename = `library_report_${period}_${range.from}_to_${range.to}.${format}`;
-  const buffer = format === 'csv'
-    ? Buffer.from(buildCsv(summary, rows, summaryOnly), 'utf8')
-    : await buildXlsx(summary, rows, summaryOnly);
+  const filename = range.from === range.to
+    ? `daily_logs_${range.from}.${format}`
+    : `daily_logs_${range.from}_to_${range.to}.${format}`;
+  const buffer = format === 'csv' ? Buffer.from(buildCsv(rows), 'utf8') : await buildXlsx(rows);
   const contentType = format === 'csv'
     ? 'text/csv; charset=utf-8'
     : 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
@@ -209,6 +200,6 @@ async function analytics(db, period, date) {
 }
 
 module.exports = {
-  AUTO_LOGOUT_NOTE, DETAIL_COLUMNS,
+  AUTO_LOGOUT_NOTE, DETAIL_COLUMNS, SHEET_NAME,
   visitsInRange, summarize, buildReport, summaryText, analytics,
 };
