@@ -6,10 +6,17 @@ const { openDb, dbOptionsFromEnv } = require('./src/db');
 const { createApp, appOptionsFromEnv } = require('./src/app');
 const { runAutoExit } = require('./src/library');
 
+// Local settings such as ADMIN_PASSWORD live in .env, which is not committed.
+try {
+  process.loadEnvFile(path.join(__dirname, '.env'));
+} catch {
+  // No .env file.
+}
+
 const PORT = Number(process.env.PORT) || 5000;
 
-if (!process.env.ADMIN_PASSWORD) {
-  console.warn('WARNING: using the default admin password. Set ADMIN_PASSWORD before going live.');
+if (!process.env.ADMIN_PASSWORD && !process.env.ADMIN_PASSWORD_HASH) {
+  console.warn('WARNING: no admin password set (ADMIN_PASSWORD in .env); admin login is disabled.');
 }
 
 async function main() {

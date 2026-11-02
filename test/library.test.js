@@ -177,3 +177,26 @@ test('CSV round trip with quoting and formula guard', () => {
   assert.deepEqual(rows[0], ['a', 'b']);
   assert.deepEqual(rows[1], ['B.Tech. (Mechanical), CSE', "'=1+1"]);
 });
+
+test('admin login checks the configured ID and password or hash', async () => {
+  const crypto = require('node:crypto');
+  const { createApp } = require('../src/app');
+  const salt = crypto.randomBytes(16);
+  const hash = `scrypt:${salt.toString('hex')}:${crypto.scryptSync('test-pass', salt, 32).toString('hex')}`;
+  for (const opts of [{ adminPassword: 'test-pass' }, { adminPasswordHash: hash }, {}]) {
+    const app = createApp(openDb({ file: ':memory:' }), { adminUser: 'PU01A', ...opts });
+    const server = app.listen(0);
+    const url = `http://127.0.0.1:${server.address().port}/api/admin/login`;
+    const login = (username, password) => fetch(url, {
+      method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ username, password }),
+    }).then((r) => r.status);
+    try {
+      const configured = Object.keys(opts).length > 0;
+      assert.equal(await login('PU01A', 'test-pass'), configured ? 200 : 401);
+      assert.equal(await login('PU01A', 'wrong'), 401);
+      assert.equal(await login('other', 'test-pass'), 401);
+    } finally {
+      server.close();
+    }
+  }
+});

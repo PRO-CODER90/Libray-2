@@ -23,18 +23,22 @@ npm install
 npm start
 ```
 
+Put local settings in a `.env` file next to `server.js` (it is not committed), e.g. `ADMIN_PASSWORD=...`.
+On Windows, `start.bat` asks for the admin password on first run and creates it.
+
 On Windows, double-click `start.bat`. It checks Node.js, installs dependencies on first run,
 starts the server and opens the browser. Close the "Library Server" window to stop it.
 
 - Home screen: http://localhost:5000
-- Admin panel: http://localhost:5000/admin.html (default `admin` / `admin123`)
+- Admin panel: http://localhost:5000/admin.html
 
 | Variable | Default | Purpose |
 |---|---|---|
 | `PORT` | `5000` | HTTP port |
 | `DB_FILE` | `data/library.db` | SQLite database file |
-| `ADMIN_USER` | `admin` | Admin username |
-| `ADMIN_PASSWORD` | `admin123` | Admin password, **change this** |
+| `ADMIN_USER` | `PU01A` | Admin ID |
+| `ADMIN_PASSWORD` | – | Admin password (required for admin login) |
+| `ADMIN_PASSWORD_HASH` | – | Alternative to `ADMIN_PASSWORD`, as `scrypt:<salt>:<hash>` |
 | `TURSO_DATABASE_URL` | – | Use Turso instead of the local file |
 | `TURSO_AUTH_TOKEN` | – | Turso token |
 | `SESSION_SECRET` | derived from admin login | Signs admin login cookies |
@@ -50,7 +54,7 @@ partner logo (`partner.png`). Replace any of them with a higher-resolution file 
 1. Create a database at [turso.tech](https://turso.tech) and copy its URL (`libsql://...`) and an auth token.
 2. On [vercel.com](https://vercel.com), import this GitHub repo. No build settings needed; `vercel.json` covers them.
 3. In the Vercel project, under **Settings → Environment Variables**, add `TURSO_DATABASE_URL`,
-   `TURSO_AUTH_TOKEN`, `ADMIN_PASSWORD`, and a random `CRON_SECRET`. Redeploy.
+   `TURSO_AUTH_TOKEN`, `ADMIN_USER`, `ADMIN_PASSWORD` and a random `CRON_SECRET`. Redeploy.
 4. Load members from the admin panel, or from your PC with the Turso variables set:
    `npm run seed -- daily_logs_2026-08-19.xlsx`.
 

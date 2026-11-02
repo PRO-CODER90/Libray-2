@@ -42,6 +42,14 @@ if not exist "node_modules\" (
   )
 )
 
+REM --- First run: store the admin login in .env (kept on this PC only) ---
+if not exist ".env" (
+  echo First run: set the admin login for this PC.
+  set /p "ADMIN_ID=Admin ID [PU01A]: "
+  set /p "ADMIN_PW=Admin password: "
+  call :write_env
+)
+
 if /i "%~1"=="pull" goto pull
 if not "%~1"=="" goto import
 
@@ -92,6 +100,13 @@ set "TURSO_DATABASE_URL="
 set "TURSO_AUTH_TOKEN="
 pause
 exit /b
+
+REM --- Write .env from the answers above ---
+:write_env
+if "%ADMIN_ID%"=="" set "ADMIN_ID=PU01A"
+> ".env" echo ADMIN_USER=%ADMIN_ID%
+>> ".env" echo ADMIN_PASSWORD=%ADMIN_PW%
+exit /b 0
 
 REM --- Exit code 0 when the server answers ---
 :is_up

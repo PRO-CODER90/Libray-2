@@ -20,12 +20,22 @@ function parseCookies(header = '') {
   return out;
 }
 
+// passwordHash is "scrypt:<salt hex>:<hash hex>".
+function checkHash(given, passwordHash) {
+  const [, salt, hash] = String(passwordHash).split(':');
+  const expected = Buffer.from(hash || '', 'hex');
+  const actual = crypto.scryptSync(String(given), Buffer.from(salt || '', 'hex'), expected.length || 32);
+  return expected.length > 0 && crypto.timingSafeEqual(actual, expected);
+}
+
 // Sessions are signed tokens rather than server memory, so they keep working
 // on Vercel where each request may hit a different instance. Without a
 // SESSION_SECRET the key derives from the credentials, so changing the admin
-// password logs everyone out.
-function createAuth({ username, password, secret }) {
-  const key = secret || sha256(`library-session:${username}:${password}`).toString('hex');
+// password logs everyone out. A plain password, when given, takes precedence
+// over passwordHash.
+function createAuth({ username, password, passwordHash, secret }) {
+  const key = secret || sha256(`library-session:${username}:${password || passwordHash}`).toString('hex');
+  const passwordOk = (p) => (password ? safeEqual(p, password) : checkHash(p, passwordHash));
   const sign = (expiry) => crypto.createHmac('sha256', key).update(String(expiry)).digest('hex');
 
   function cookie(req, value, maxAge) {
@@ -42,7 +52,7 @@ function createAuth({ username, password, secret }) {
   function login(req, res) {
     const { username: u = '', password: p = '' } = req.body || {};
     // Evaluate both so timing doesn't reveal which one was wrong.
-    const ok = safeEqual(u, username) & safeEqual(p, password);
+    const ok = safeEqual(u, username) & passwordOk(p);
     if (!ok) return res.status(401).json({ message: 'Invalid username or password' });
 
     const expiry = Date.now() + SESSION_HOURS * 3600 * 1000;

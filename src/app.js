@@ -8,6 +8,11 @@ const { importMembers } = require('./importer');
 const { toCsv } = require('./csv');
 const { createAuth } = require('./auth');
 
+// The admin ID defaults to PU01A; the password must come from the environment
+// (ADMIN_PASSWORD, or ADMIN_PASSWORD_HASH as scrypt:<salt>:<hash>), so no
+// credential lives in the code. Without one, admin login is disabled.
+const DEFAULT_ADMIN_USER = 'PU01A';
+
 const EXPORT_COLUMNS = [
   'full_reg_no', 'name', 'branch', 'year', 'entry_date', 'entry_time',
   'exit_date', 'exit_time', 'role', 'exit_reason',
@@ -15,9 +20,11 @@ const EXPORT_COLUMNS = [
 
 // dbReady is the database, or a promise of it, so the app can be created
 // synchronously (Vercel needs the handler at import time).
-function createApp(dbReady, { adminUser, adminPassword, sessionSecret, cronSecret }) {
+function createApp(dbReady, { adminUser, adminPassword, adminPasswordHash, sessionSecret, cronSecret }) {
   const app = express();
-  const auth = createAuth({ username: adminUser, password: adminPassword, secret: sessionSecret });
+  const auth = createAuth({
+    username: adminUser, password: adminPassword, passwordHash: adminPasswordHash, secret: sessionSecret,
+  });
   let db;
 
   app.disable('x-powered-by');
@@ -156,8 +163,9 @@ function createApp(dbReady, { adminUser, adminPassword, sessionSecret, cronSecre
 
 function appOptionsFromEnv() {
   return {
-    adminUser: process.env.ADMIN_USER || 'admin',
-    adminPassword: process.env.ADMIN_PASSWORD || 'admin123',
+    adminUser: process.env.ADMIN_USER || DEFAULT_ADMIN_USER,
+    adminPassword: process.env.ADMIN_PASSWORD,
+    adminPasswordHash: process.env.ADMIN_PASSWORD_HASH,
     sessionSecret: process.env.SESSION_SECRET,
     cronSecret: process.env.CRON_SECRET,
   };
