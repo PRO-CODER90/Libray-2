@@ -62,12 +62,12 @@ function renderAnalytics(data) {
       labels,
       datasets: [
         { label: 'Manual exit', data: series.map((s) => s.manual), backgroundColor: COLORS.blue },
-        { label: 'AUTO-LOGOUT', data: series.map((s) => s.auto), backgroundColor: COLORS.pink },
+        { label: 'DO NOT LOGOUT', data: series.map((s) => s.auto), backgroundColor: COLORS.pink },
         { label: 'Still inside', data: series.map((s) => s.inside), backgroundColor: COLORS.grey },
       ],
     },
     options: { maintainAspectRatio: false, scales: { x: { stacked: true }, y: { ...integerY, stacked: true } }, plugins: { legend: { position: 'bottom' } } },
-  }, { head: [period === 'day' ? 'Hour' : 'Day', 'Manual exit', 'AUTO-LOGOUT', 'Still inside'], rows: series.map((s) => [s.range || s.label, s.manual, s.auto, s.inside]) });
+  }, { head: [period === 'day' ? 'Hour' : 'Day', 'Manual exit', 'DO NOT LOGOUT', 'Still inside'], rows: series.map((s) => [s.range || s.label, s.manual, s.auto, s.inside]) });
 
   drawChart('branch', {
     type: 'bar',

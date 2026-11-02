@@ -87,7 +87,7 @@ Sidebar sections after login:
 |---|---|
 | Dashboard | Live clock (synced to the server, IST), people inside, entries today, peak hour, timings |
 | Entry Analytics | Day / week / month charts: entries, students vs faculty, manual exits vs auto-logouts, top branches, plus a table view |
-| Reports | Excel or CSV for a day, week (Mon–Sun) or month; summary + one row per visit; `AUTO-LOGOUT` note only on visits the system closed; optional email to the admin |
+| Reports | Excel or CSV for a day, week (Mon–Sun) or month; Daily Logs layout; Reason `DO NOT LOGOUT` only on visits the system closed; optional email to the admin |
 | Share Report | Saved recipient list; send by email (summary only or full detail), download, Gmail draft, or the device share sheet |
 | Backups | Daily automatic backup after closing time and **Backup now**; kept 30 days; download and restore (asks for the password, takes a safety backup first) |
 | Members & Settings | Import members, library timings, daily logs |

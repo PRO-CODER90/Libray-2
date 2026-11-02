@@ -532,7 +532,7 @@ async function loadLogs() {
     return el('tr', {},
       ...[r.full_reg_no, r.name, r.branch, r.year, r.role, formatTime12(r.entry_time), r.exit_time ? formatTime12(r.exit_time) : 'Inside']
         .map((c) => el('td', { textContent: c ?? '' })),
-      el('td', { className: auto ? 'auto' : '', textContent: auto ? 'AUTO-LOGOUT' : '' }));
+      el('td', { className: auto ? 'auto' : '', textContent: auto ? 'DO NOT LOGOUT' : '' }));
   }));
   $('logs-empty').hidden = body.length > 0;
 }

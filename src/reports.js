@@ -5,7 +5,7 @@ const { periodRange, eachDate, DAYS } = require('./periods');
 const { hourLabel, hourRangeLabel } = require('./time');
 const { AUTO_EXIT_REASON } = require('./library');
 
-const AUTO_LOGOUT_NOTE = 'AUTO-LOGOUT';
+const AUTO_LOGOUT_NOTE = AUTO_EXIT_REASON;
 
 // The library's own "Daily Logs" sheet: the same layout the staff upload
 // (daily_logs_YYYY-MM-DD.xlsx), including the blank fifth column. Every
@@ -35,7 +35,7 @@ async function visitsInRange(db, from, to) {
     WHERE l.entry_date BETWEEN ? AND ?
     ORDER BY l.entry_date, l.entry_time, l.id
   `, [from, to]);
-  // The note is AUTO-LOGOUT only when the system closed the visit; manual
+  // The Reason is DO NOT LOGOUT only when the system closed the visit; manual
   // exits and people still inside get a blank note.
   return rows.map((r) => ({ ...r, note: r.exit_reason === AUTO_EXIT_REASON ? AUTO_LOGOUT_NOTE : '' }));
 }

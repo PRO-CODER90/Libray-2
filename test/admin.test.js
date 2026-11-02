@@ -47,7 +47,7 @@ test('period ranges: day, Monday–Sunday week, calendar month', () => {
 
 const LAYOUT = ['full_reg_no', 'name', 'branch', 'year', '', 'entry_date', 'entry_time', 'exit_date', 'exit_time', 'role', 'Reason'];
 
-test('report summary counts and AUTO-LOGOUT only on system-closed visits', async () => {
+test('report summary counts and DO NOT LOGOUT only on system-closed visits', async () => {
   const db = await seeded();
   const r = await buildReport(db, { period: 'month', date: '2026-10-15', format: 'csv' });
   assert.equal(r.summary.total_entries, 2);
@@ -61,13 +61,13 @@ test('report summary counts and AUTO-LOGOUT only on system-closed visits', async
   const rows = await visitsInRange(db, '2026-10-01', '2026-11-30');
   const notes = Object.fromEntries(rows.map((v) => [`${v.full_reg_no}@${v.entry_date}`, v.note]));
   assert.equal(notes['2026/1@2026-10-28'], '');
-  assert.equal(notes['F1@2026-10-28'], 'AUTO-LOGOUT');
+  assert.equal(notes['F1@2026-10-28'], 'DO NOT LOGOUT');
   assert.equal(notes['2026/1@2026-11-02'], '');
 
   const lines = r.buffer.toString('utf8').replace(/^﻿/, '').trim().split('\r\n');
   assert.equal(lines[0], LAYOUT.join(','));
   assert.equal(lines[1], '2026/1,Asha,CSE,FET2026,,2026-10-28,10:00:00,2026-10-28,11:30:00,Student,');
-  assert.match(lines[2], /^F1,"'=HYPERLINK\(""x""\)",Physics,,,2026-10-28,12:15:00,2026-10-28,17:00:00,Faculty,AUTO-LOGOUT$/);
+  assert.match(lines[2], /^F1,"'=HYPERLINK\(""x""\)",Physics,,,2026-10-28,12:15:00,2026-10-28,17:00:00,Faculty,DO NOT LOGOUT$/);
 });
 
 test('xlsx report is the Daily Logs sheet in the uploaded layout', async () => {
@@ -83,7 +83,7 @@ test('xlsx report is the Daily Logs sheet in the uploaded layout', async () => {
   assert.deepEqual(header, LAYOUT);
   assert.equal(ws.getRow(1).getCell(1).font.bold, true);
   assert.equal(ws.getRow(3).getCell(9).value, '17:00:00');
-  assert.equal(ws.getRow(3).getCell(11).value, 'AUTO-LOGOUT');
+  assert.equal(ws.getRow(3).getCell(11).value, 'DO NOT LOGOUT');
   assert.equal(ws.getRow(2).getCell(11).value, null);
   assert.equal(ws.rowCount, 3);
 });
