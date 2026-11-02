@@ -37,6 +37,38 @@ const SCHEMA = `
     key   TEXT PRIMARY KEY,
     value TEXT NOT NULL
   );
+
+  CREATE TABLE IF NOT EXISTS admin_audit (
+    id     INTEGER PRIMARY KEY AUTOINCREMENT,
+    at     TEXT NOT NULL,
+    action TEXT NOT NULL,
+    detail TEXT,
+    ip     TEXT
+  );
+  CREATE INDEX IF NOT EXISTS idx_audit_at ON admin_audit(at);
+
+  CREATE TABLE IF NOT EXISTS recipients (
+    id     INTEGER PRIMARY KEY AUTOINCREMENT,
+    name   TEXT NOT NULL,
+    email  TEXT NOT NULL UNIQUE,
+    role   TEXT,
+    active INTEGER NOT NULL DEFAULT 1
+  );
+
+  CREATE TABLE IF NOT EXISTS login_attempts (
+    key TEXT NOT NULL,
+    at  TEXT NOT NULL
+  );
+  CREATE INDEX IF NOT EXISTS idx_attempts_key ON login_attempts(key, at);
+
+  -- Online mode only: there is no disk, so backups live here.
+  CREATE TABLE IF NOT EXISTS backups (
+    name         TEXT PRIMARY KEY,
+    created_at   TEXT NOT NULL,
+    rows_members INTEGER,
+    rows_logs    INTEGER,
+    data         BLOB
+  );
 `;
 
 const DEFAULT_SETTINGS = {
@@ -55,6 +87,9 @@ function openLocal(file) {
   // finish without anything else interleaving.
   return {
     kind: 'sqlite',
+    file,
+    // The raw connection, for backup and restore (VACUUM INTO, ATTACH).
+    sqlite: db,
     all: async (sql, args = []) => db.prepare(sql).all(...args),
     get: async (sql, args = []) => db.prepare(sql).get(...args),
     run: async (sql, args = []) => ({ changes: Number(db.prepare(sql).run(...args).changes) }),

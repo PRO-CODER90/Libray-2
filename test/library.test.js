@@ -188,7 +188,7 @@ test('admin login checks the configured ID and password or hash', async () => {
     const server = app.listen(0);
     const url = `http://127.0.0.1:${server.address().port}/api/admin/login`;
     const login = (username, password) => fetch(url, {
-      method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ username, password }),
+      method: 'POST', headers: { 'content-type': 'application/json', 'x-requested-with': 'XMLHttpRequest' }, body: JSON.stringify({ username, password }),
     }).then((r) => r.status);
     try {
       const configured = Object.keys(opts).length > 0;

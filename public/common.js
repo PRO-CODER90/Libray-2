@@ -16,7 +16,8 @@ async function api(path, options = {}) {
   const res = await fetch(path, {
     credentials: 'same-origin',
     ...options,
-    headers: { 'Content-Type': 'application/json', ...(options.headers || {}) },
+    // The custom header marks the call as coming from this app (CSRF check).
+    headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest', ...(options.headers || {}) },
   });
   let body = null;
   try { body = await res.json(); } catch { /* empty body */ }

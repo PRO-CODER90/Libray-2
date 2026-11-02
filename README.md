@@ -79,13 +79,37 @@ npm run seed -- daily_logs_2026-08-19.xlsx --reset                  # wipe membe
 `--demo-logs` adds random visits on that date, some left open, so peak time,
 auto-exit and the CSV report can be tested. Use `--reset` before going live.
 
-## Admin
+## Admin panel
 
-- **Import members** from `.xlsx` or `.csv` with columns `full_reg_no, name, branch, year, role`
-  (the `Daily Logs` sheet format works as is). Bad or duplicate rows are skipped and listed.
-- **Timings**: set opening and closing time.
-- **Daily logs**: view any date and download it as `daily_logs_<date>.csv`.
-- **Entries by hour** chart with the peak hour highlighted.
+Sidebar sections after login:
+
+| Section | What it does |
+|---|---|
+| Dashboard | Live clock (synced to the server, IST), people inside, entries today, peak hour, timings |
+| Entry Analytics | Day / week / month charts: entries, students vs faculty, manual exits vs auto-logouts, top branches, plus a table view |
+| Reports | Excel or CSV for a day, week (Mon–Sun) or month; summary + one row per visit; `AUTO-LOGOUT` note only on visits the system closed; optional email to the admin |
+| Share Report | Saved recipient list; send by email (summary only or full detail), download, Gmail draft, or the device share sheet |
+| Backups | Daily automatic backup after closing time and **Backup now**; kept 30 days; download and restore (asks for the password, takes a safety backup first) |
+| Members & Settings | Import members, library timings, daily logs |
+| Contact Developer | Developer details (from `DEV_*` settings) and a form that posts to Formspree |
+| Security & Privacy | Change password, privacy policy, audit log (90 days) |
+
+Security: 5 failed logins in 15 minutes lock the ID and IP for 15 minutes; sessions end after 20 idle minutes or 8 hours, and logout or a password change revokes old sessions; security headers (CSP, frame blocking, no-sniff, HSTS on HTTPS); admin calls need an `X-Requested-With` header; `/api/inside` returns no registration numbers; the server listens on this PC only unless `HOST=0.0.0.0`.
+
+### More settings (`.env` offline, Environment Variables on Vercel)
+
+| Variable | Purpose |
+|---|---|
+| `ADMIN_EMAIL` | Where reports go |
+| `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `MAIL_FROM` | Email sending. For Gmail: `smtp.gmail.com`, `465`, and an App Password |
+| `AUTO_REPORTS=1` | Email yesterday's report each morning, last week's on Monday, last month's on the 1st |
+| `BACKUP_KEEP_DAYS` | Days of backups to keep (default 30) |
+| `BACKUP_DIR` | Backup folder offline (default `data/backups`) |
+| `ADMIN_ALLOWED_IPS` | Comma-separated IPs allowed into the admin area |
+| `HOST` | `0.0.0.0` to allow other PCs on the network (default this PC only) |
+| `DEV_NAME`, `DEV_EMAIL`, `DEV_PHONE`, `DEV_HOURS`, `DEV_RESPONSE`, `DEV_ROLE` | Contact Developer card |
+
+Offline backups live in `data/backups/`; copy that folder to a USB drive or cloud folder regularly.
 
 ## API
 
@@ -98,7 +122,14 @@ auto-exit and the CSV report can be tested. Use `--reset` before going live.
 | POST | `/api/admin/import` | Raw file body, `X-Filename` header |
 | GET/PUT | `/api/admin/settings` | Opening / closing time |
 | GET | `/api/admin/logs?date=` | Logs for a date |
-| GET | `/api/admin/export?date=` | CSV report |
+| GET | `/api/admin/export?date=` | Quick daily CSV |
+| GET | `/api/admin/analytics?period=&date=` | Chart data |
+| GET | `/api/admin/report?period=&date=&format=` | Report download |
+| POST | `/api/admin/report/email`, `/api/admin/report/share` | Email a report |
+| GET/POST/PUT/DELETE | `/api/admin/recipients` | Share list |
+| GET/POST | `/api/admin/backups`, `/api/admin/backups/:name`, `.../restore` | Backups |
+| GET | `/api/admin/audit` | Audit log |
+| POST | `/api/admin/password` | Change password |
 
 ## Tests
 

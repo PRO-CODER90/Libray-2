@@ -16,6 +16,10 @@
   "dependencies": {
     "@libsql/client": "^0.18.0",
     "exceljs": "^4.4.0",
-    "express": "^5.3.0"
+    "express": "^5.3.0",
+    "nodemailer": "^7.0.13"
+  },
+  "devDependencies": {
+    "chart.js": "^4.6.1"
   }
 }

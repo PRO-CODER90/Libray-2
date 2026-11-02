@@ -43,4 +43,4 @@ function toCsv(columns, rows) {
   return `﻿${lines.join('\r\n')}\r\n`;
 }
 
-module.exports = { parseCsv, toCsv };
+module.exports = { parseCsv, toCsv, escapeField };

@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700;900&display=swap">
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="admin.css">
   <link rel="stylesheet" href="login.css">
 </head>
 <body>
@@ -19,6 +19,17 @@
     <symbol id="i-lock" viewBox="0 0 24 24"><rect x="4.5" y="10.5" width="15" height="11" rx="2"/><path d="M8 10.5V7a4 4 0 0 1 8 0v3.5"/><path d="M12 15v2.5"/></symbol>
     <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></symbol>
     <symbol id="i-eye-off" viewBox="0 0 24 24"><path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12z"/><circle cx="12" cy="12" r="3"/><path d="M4 20 20 4"/></symbol>
+    <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7.5" height="7.5" rx="1.5"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="1.5"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="1.5"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="1.5"/></symbol>
+    <symbol id="i-chart" viewBox="0 0 24 24"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/></symbol>
+    <symbol id="i-file" viewBox="0 0 24 24"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/><path d="M14 3v6h6M8 13h8M8 17h5"/></symbol>
+    <symbol id="i-send" viewBox="0 0 24 24"><path d="M22 2 11 13"/><path d="M22 2 15 22l-4-9-9-4z"/></symbol>
+    <symbol id="i-db" viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5"/><path d="M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/></symbol>
+    <symbol id="i-users" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
+    <symbol id="i-mail" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m2 6 10 7 10-7"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 2 4 5v6c0 5 3.4 9.3 8 11 4.6-1.7 8-6 8-11V5z"/><path d="m9 12 2 2 4-4"/></symbol>
+    <symbol id="i-logout" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5M21 12H9"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></symbol>
+    <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></symbol>
   </svg>
 
   <div id="login-view" class="login-view" hidden>
@@ -56,69 +67,255 @@
     </form>
   </div>
 
-  <header class="topbar" hidden>
-    <h1>LIBRARY ADMIN</h1>
-    <nav class="admin-nav">
-      <a href="/">Home screen</a>
-      <button id="logout" type="button" class="link" hidden>Log out</button>
-    </nav>
-  </header>
+  <div id="app" class="app" hidden>
+    <aside class="sidebar">
+      <div class="sb-brand">
+        <img src="assets/logo-white.png" alt="">
+        <div><b>LIBRARY</b><small>Admin panel</small></div>
+      </div>
+      <nav class="sb-nav" id="nav">
+        <a href="#dashboard" data-section="dashboard"><svg class="icon"><use href="#i-grid"/></svg>Dashboard</a>
+        <a href="#analytics" data-section="analytics"><svg class="icon"><use href="#i-chart"/></svg>Entry Analytics</a>
+        <a href="#reports" data-section="reports"><svg class="icon"><use href="#i-file"/></svg>Reports</a>
+        <a href="#share" data-section="share"><svg class="icon"><use href="#i-send"/></svg>Share Report</a>
+        <a href="#backups" data-section="backups"><svg class="icon"><use href="#i-db"/></svg>Backups</a>
+        <a href="#members" data-section="members"><svg class="icon"><use href="#i-users"/></svg>Members &amp; Settings</a>
+        <a href="#contact" data-section="contact"><svg class="icon"><use href="#i-mail"/></svg>Contact Developer</a>
+        <a href="#security" data-section="security"><svg class="icon"><use href="#i-shield"/></svg>Security &amp; Privacy</a>
+      </nav>
+      <div class="sb-foot">
+        <a href="/" class="sb-link"><svg class="icon"><use href="#i-home"/></svg>Home screen</a>
+        <button id="logout" type="button" class="sb-link"><svg class="icon"><use href="#i-logout"/></svg>Log out</button>
+      </div>
+    </aside>
 
-  <main class="admin">
-    <div id="panel" hidden>
-      <section class="card">
-        <h2>Overview</h2>
+    <main class="main">
+      <!-- 1. Dashboard -->
+      <section id="sec-dashboard" class="section">
+        <h1>Dashboard</h1>
+        <div class="card clock-card">
+          <svg class="icon"><use href="#i-calendar"/></svg>
+          <div><div id="dash-date" class="dash-date">&nbsp;</div><div id="dash-time" class="dash-time tabular">&nbsp;</div></div>
+        </div>
+        <div class="kpis">
+          <div class="card kpi"><span>People inside now</span><b id="kpi-inside">–</b></div>
+          <div class="card kpi"><span>Entries today</span><b id="kpi-today">–</b></div>
+          <div class="card kpi"><span>Peak hour today</span><b id="kpi-peak">–</b></div>
+          <div class="card kpi"><span>Library timings</span><b id="kpi-timings">–</b></div>
+        </div>
         <p id="stats" class="muted"></p>
       </section>
 
-      <section class="card">
-        <h2>Library Timings</h2>
-        <form id="settings-form" class="inline-form">
-          <label>Opening <input type="time" name="opening_time" required></label>
-          <label>Closing <input type="time" name="closing_time" required></label>
-          <button type="submit">Save</button>
-          <span id="settings-msg" class="muted"></span>
-        </form>
-      </section>
-
-      <section class="card">
-        <h2>Import Members</h2>
-        <p class="muted">Upload a .xlsx or .csv file with columns
-          <code>full_reg_no, name, branch, year, role</code>. Existing members are updated.</p>
-        <form id="import-form" class="inline-form">
-          <input type="file" name="file" accept=".xlsx,.csv" required>
-          <button type="submit">Import</button>
-        </form>
-        <div id="import-result"></div>
-      </section>
-
-      <section class="card">
-        <h2>Daily Logs</h2>
-        <div class="inline-form">
-          <label>Date <input type="date" id="log-date"></label>
-          <button id="download-csv" type="button">Download CSV report</button>
+      <!-- 2. Entry Analytics -->
+      <section id="sec-analytics" class="section" hidden>
+        <h1>Entry Analytics</h1>
+        <div class="card toolbar" id="an-picker"></div>
+        <div class="kpis five" id="an-cards"></div>
+        <div class="chart-grid">
+          <div class="card chart-card wide" data-chart="main"><header><h2 id="an-main-title">Entries</h2><button type="button" class="link toggle-table">Show as table</button></header><div class="chart-box"><canvas></canvas></div><div class="chart-table" hidden></div></div>
+          <div class="card chart-card" data-chart="role"><header><h2>Student vs Faculty</h2><button type="button" class="link toggle-table">Show as table</button></header><div class="chart-box"><canvas></canvas></div><div class="chart-table" hidden></div></div>
+          <div class="card chart-card" data-chart="exits"><header><h2>Manual exits vs auto-logouts</h2><button type="button" class="link toggle-table">Show as table</button></header><div class="chart-box"><canvas></canvas></div><div class="chart-table" hidden></div></div>
+          <div class="card chart-card wide" data-chart="branch"><header><h2>Entries by branch (top 10)</h2><button type="button" class="link toggle-table">Show as table</button></header><div class="chart-box"><canvas></canvas></div><div class="chart-table" hidden></div></div>
         </div>
-        <div class="table-wrap">
-          <table id="logs-table">
-            <thead><tr>
-              <th>Reg. No</th><th>Name</th><th>Branch</th><th>Year</th><th>Role</th>
-              <th>Entry</th><th>Exit</th><th>Exit reason</th>
-            </tr></thead>
-            <tbody></tbody>
-          </table>
-        </div>
-        <p id="logs-empty" class="muted" hidden>No entries on this date.</p>
       </section>
 
-      <section class="card">
-        <h2>Entries by Hour</h2>
-        <p id="peak-label" class="muted"></p>
-        <div id="chart" class="chart"></div>
+      <!-- 3. Reports -->
+      <section id="sec-reports" class="section" hidden>
+        <h1>Reports</h1>
+        <div class="card form-card">
+          <div id="rp-picker"></div>
+          <fieldset class="row">
+            <legend>Format</legend>
+            <label class="pill"><input type="radio" name="rp-format" value="xlsx" checked> Excel (.xlsx)</label>
+            <label class="pill"><input type="radio" name="rp-format" value="csv"> CSV</label>
+          </fieldset>
+          <label class="check"><input type="checkbox" id="rp-email" checked> Also email to admin <span id="rp-admin-email" class="muted"></span></label>
+          <div class="actions">
+            <button type="button" id="rp-download" class="btn primary">Download</button>
+            <button type="button" id="rp-email-only" class="btn">Email to admin</button>
+          </div>
+          <p id="rp-msg" class="msg" role="status"></p>
+          <p class="muted small">Each report has a summary (entries, exits, manual exits, auto-logouts, still inside, unique visitors, students and faculty) and one row per visit. The note column says AUTO-LOGOUT only when the system closed the visit.</p>
+        </div>
       </section>
-    </div>
-  </main>
+
+      <!-- 4. Share Report -->
+      <section id="sec-share" class="section" hidden>
+        <h1>Share Report</h1>
+        <div class="two-col">
+          <div class="card form-card">
+            <h2>Send a report</h2>
+            <div id="sh-picker"></div>
+            <fieldset class="row">
+              <legend>Format</legend>
+              <label class="pill"><input type="radio" name="sh-format" value="xlsx" checked> Excel</label>
+              <label class="pill"><input type="radio" name="sh-format" value="csv"> CSV</label>
+            </fieldset>
+            <fieldset class="row">
+              <legend>Contents</legend>
+              <label class="pill"><input type="radio" name="sh-detail" value="summary" checked> Summary only (no names)</label>
+              <label class="pill"><input type="radio" name="sh-detail" value="full"> Full detail</label>
+            </fieldset>
+            <fieldset>
+              <legend>Recipients</legend>
+              <div id="sh-recipients" class="checklist"><p class="muted">No saved recipients yet.</p></div>
+            </fieldset>
+            <label>Other email (one-off)<input type="email" id="sh-extra" maxlength="254" placeholder="name@example.com"></label>
+            <label>Message (optional)<textarea id="sh-note" maxlength="1000" rows="3"></textarea></label>
+            <div class="actions">
+              <button type="button" id="sh-send" class="btn primary">Send email</button>
+              <button type="button" id="sh-download" class="btn">Download</button>
+              <button type="button" id="sh-gmail" class="btn">Open Gmail draft</button>
+              <button type="button" id="sh-native" class="btn" hidden>Share…</button>
+            </div>
+            <p id="sh-msg" class="msg" role="status"></p>
+          </div>
+          <div class="card form-card">
+            <h2>Library members' emails</h2>
+            <form id="rc-form" class="rc-form">
+              <input type="hidden" name="id">
+              <input name="name" placeholder="Name" maxlength="80" required>
+              <input name="email" type="email" placeholder="Email" maxlength="254" required>
+              <input name="role" placeholder="Role (e.g. Librarian)" maxlength="60">
+              <label class="check"><input type="checkbox" name="active" checked> Active</label>
+              <div class="actions"><button class="btn primary" type="submit">Save</button><button class="btn" type="reset">Clear</button></div>
+            </form>
+            <p id="rc-msg" class="msg" role="status"></p>
+            <div class="table-wrap"><table id="rc-table"><thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Active</th><th></th></tr></thead><tbody></tbody></table></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 5. Backups -->
+      <section id="sec-backups" class="section" hidden>
+        <h1>Backups</h1>
+        <div class="card form-card">
+          <p id="bk-info" class="muted"></p>
+          <div class="actions"><button type="button" id="bk-now" class="btn primary">Backup now</button></div>
+          <p id="bk-msg" class="msg" role="status"></p>
+          <div class="table-wrap"><table id="bk-table"><thead><tr><th>Backup</th><th>Created</th><th>Size</th><th>Members</th><th>Visits</th><th></th></tr></thead><tbody></tbody></table></div>
+          <p id="bk-empty" class="muted" hidden>No backups yet.</p>
+        </div>
+      </section>
+
+      <!-- 6. Members & Settings -->
+      <section id="sec-members" class="section" hidden>
+        <h1>Members &amp; Settings</h1>
+        <div class="two-col">
+          <div class="card form-card">
+            <h2>Library timings</h2>
+            <form id="settings-form" class="row">
+              <label>Opening <input type="time" name="opening_time" required></label>
+              <label>Closing <input type="time" name="closing_time" required></label>
+              <button type="submit" class="btn primary">Save</button>
+            </form>
+            <p id="settings-msg" class="msg" role="status"></p>
+          </div>
+          <div class="card form-card">
+            <h2>Import members</h2>
+            <p class="muted small">Upload a .xlsx or .csv file with columns <code>full_reg_no, name, branch, year, role</code>. Existing members are updated.</p>
+            <form id="import-form" class="row">
+              <input type="file" name="file" accept=".xlsx,.csv" required>
+              <button type="submit" class="btn primary">Import</button>
+            </form>
+            <div id="import-result" class="msg"></div>
+          </div>
+        </div>
+        <div class="card form-card">
+          <h2>Daily logs</h2>
+          <div class="row">
+            <label>Date <input type="date" id="log-date"></label>
+            <button id="download-csv" type="button" class="btn">Quick CSV for this day</button>
+          </div>
+          <div class="table-wrap">
+            <table id="logs-table">
+              <thead><tr><th>Reg. No</th><th>Name</th><th>Branch</th><th>Year</th><th>Role</th><th>Entry</th><th>Exit</th><th>Note</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <p id="logs-empty" class="muted" hidden>No entries on this date.</p>
+        </div>
+      </section>
+
+      <!-- 7. Contact Developer -->
+      <section id="sec-contact" class="section" hidden>
+        <h1>Contact Developer</h1>
+        <div class="two-col">
+          <div class="card form-card">
+            <h2>Developer</h2>
+            <dl id="dev-card" class="dev-card"></dl>
+          </div>
+          <form id="contact-form" class="card form-card" action="https://formspree.io/f/xdeepoow" method="POST" novalidate>
+            <h2>Report a problem</h2>
+            <div class="grid2">
+              <label>Your name *<input name="name" required maxlength="80"></label>
+              <label>Designation *<select name="designation" required><option value="">Choose…</option><option>Librarian</option><option>Staff</option><option>Admin</option></select></label>
+              <label>Your email *<input name="email" type="email" required maxlength="254"></label>
+              <label>Phone number<input name="phone" type="tel" maxlength="20" pattern="[0-9+ ()-]{7,20}"></label>
+              <label>Issue type *<select name="issue_type" required><option value="">Choose…</option><option>Entry not working</option><option>Wrong member details</option><option>Report/Excel problem</option><option>Backup problem</option><option>Login problem</option><option>Feature request</option><option>Other</option></select></label>
+              <label>Priority *<select name="priority" required><option value="">Choose…</option><option>Low</option><option>Medium</option><option>High</option><option>Urgent</option></select></label>
+            </div>
+            <label>Subject *<input name="subject" required maxlength="120"></label>
+            <label>Message *<textarea name="message" required maxlength="2000" rows="5"></textarea></label>
+            <label>Date and time it happened<input name="occurred_at" type="datetime-local"></label>
+            <input name="_gotcha" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+            <p class="muted small">Do not include passwords or member data. Screenshots can't be attached here; email them to the developer instead. This form sends what you type to Formspree, a third-party service.</p>
+            <div class="actions"><button type="submit" class="btn primary">Send message</button></div>
+            <p id="contact-msg" class="msg" role="status"></p>
+          </form>
+        </div>
+      </section>
+
+      <!-- 8. Security & Privacy -->
+      <section id="sec-security" class="section" hidden>
+        <h1>Security &amp; Privacy</h1>
+        <div class="two-col">
+          <form id="password-form" class="card form-card">
+            <h2>Change password</h2>
+            <label>Current password<input name="current" type="password" required autocomplete="current-password"></label>
+            <label>New password<input name="next" type="password" required minlength="12" autocomplete="new-password"></label>
+            <label>Confirm new password<input name="confirm" type="password" required autocomplete="new-password"></label>
+            <p class="muted small">At least 12 characters with letters, numbers and symbols. Changing it signs out every other session.</p>
+            <div class="actions"><button type="submit" class="btn primary">Change password</button></div>
+            <p id="password-msg" class="msg" role="status"></p>
+          </form>
+          <div class="card form-card policy">
+            <h2>Privacy policy</h2>
+            <p>The system stores personal data of students and faculty: registration/employee number, name, branch, year, role, and the dates and times of library visits.</p>
+            <ol>
+              <li><b>Purpose:</b> the data is used only to record library attendance, manage occupancy, and prepare usage reports for the library and university.</li>
+              <li><b>Minimum data:</b> only the fields listed above are collected. No photos, phone numbers, addresses or biometrics.</li>
+              <li><b>Access:</b> only authorised library administrators may view logs, reports and backups. Reports shared with other staff must be for official library use.</li>
+              <li><b>Sharing:</b> data is not sold or given to outside parties. Third-party services in use are limited to the email provider (for sending reports) and Formspree (for the contact form, which carries only what is typed into it).</li>
+              <li><b>Retention:</b> visit logs are kept as long as the university needs them for reports; backups are kept for 30 days and then deleted automatically; audit logs for 90 days.</li>
+              <li><b>Security:</b> access is protected by a password with lockout, encrypted connections where online, and an audit trail of admin actions.</li>
+              <li><b>Downloaded reports:</b> reports downloaded or emailed contain personal data. The person receiving them is responsible for storing them safely and deleting them when no longer needed. Reports should not be posted on public channels or shared on personal messaging apps.</li>
+              <li><b>Rights and queries:</b> members can ask the library administration to correct wrong details; wrong details are fixed by re-importing the member file.</li>
+              <li><b>Breach:</b> if the admin suspects unauthorised access, they should change the password immediately, review the audit log and inform the university IT team and the developer.</li>
+              <li><b>Law:</b> the university should confirm this policy meets India's Digital Personal Data Protection Act, 2023 and its own data policy.</li>
+            </ol>
+          </div>
+        </div>
+        <div class="card form-card">
+          <h2>Audit log <span class="muted small">(last 90 days)</span></h2>
+          <div class="table-wrap"><table id="audit-table"><thead><tr><th>When</th><th>Action</th><th>Detail</th><th>IP</th></tr></thead><tbody></tbody></table></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <dialog id="dialog" class="dialog">
+    <form method="dialog">
+      <h2 id="dlg-title"></h2>
+      <p id="dlg-text"></p>
+      <input id="dlg-password" type="password" autocomplete="current-password" placeholder="Admin password" hidden>
+      <div class="actions"><button value="cancel" class="btn">Cancel</button><button value="ok" id="dlg-ok" class="btn primary">OK</button></div>
+    </form>
+  </dialog>
 
   <script src="common.js"></script>
+  <script src="vendor/chart-4.6.1.umd.min.js"></script>
+  <script src="admin-charts.js"></script>
   <script src="admin.js"></script>
 </body>
 </html>
