@@ -29,7 +29,12 @@
     <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 2 4 5v6c0 5 3.4 9.3 8 11 4.6-1.7 8-6 8-11V5z"/><path d="m9 12 2 2 4-4"/></symbol>
     <symbol id="i-logout" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5M21 12H9"/></symbol>
     <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></symbol>
-    <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></symbol>
+    <symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.9 1.9 0 0 0 3.4 0"/></symbol>
+    <symbol id="i-chevron" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+    <symbol id="i-enter" viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><path d="m10 17 5-5-5-5M15 12H3"/></symbol>
+    <symbol id="i-bars" viewBox="0 0 24 24"><rect x="2.5" y="13" width="5" height="8" rx="1"/><rect x="9.5" y="8" width="5" height="13" rx="1"/><rect x="16.5" y="3" width="5" height="18" rx="1"/></symbol>
+    <symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></symbol>
+    <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M7.5 14h.01M12 14h.01M16.5 14h.01M7.5 18h.01M12 18h.01M16.5 18h.01" stroke-width="2.2"/></symbol>
   </svg>
 
   <div id="login-view" class="login-view" hidden>
@@ -68,42 +73,61 @@
   </div>
 
   <div id="app" class="app" hidden>
-    <aside class="sidebar">
-      <div class="sb-brand">
-        <img src="assets/logo-white.png" alt="">
-        <div><b>LIBRARY</b><small>Admin panel</small></div>
+    <header class="topbar">
+      <div class="tb-brand">
+        <img src="assets/logo.png" alt="Poornima University">
+        <span class="tb-word"><b>POORNIMA</b><small>UNIVERSITY</small></span>
+        <span class="tb-divider"></span>
+        <span class="tb-title">Library Admin Panel</span>
       </div>
-      <nav class="sb-nav" id="nav">
-        <a href="#dashboard" data-section="dashboard"><svg class="icon"><use href="#i-grid"/></svg>Dashboard</a>
-        <a href="#analytics" data-section="analytics"><svg class="icon"><use href="#i-chart"/></svg>Entry Analytics</a>
-        <a href="#reports" data-section="reports"><svg class="icon"><use href="#i-file"/></svg>Reports</a>
-        <a href="#share" data-section="share"><svg class="icon"><use href="#i-send"/></svg>Share Report</a>
-        <a href="#backups" data-section="backups"><svg class="icon"><use href="#i-db"/></svg>Backups</a>
-        <a href="#members" data-section="members"><svg class="icon"><use href="#i-users"/></svg>Members &amp; Settings</a>
-        <a href="#contact" data-section="contact"><svg class="icon"><use href="#i-mail"/></svg>Contact Developer</a>
-        <a href="#security" data-section="security"><svg class="icon"><use href="#i-shield"/></svg>Security &amp; Privacy</a>
-      </nav>
-      <div class="sb-foot">
-        <a href="/" class="sb-link"><svg class="icon"><use href="#i-home"/></svg>Home screen</a>
-        <button id="logout" type="button" class="sb-link"><svg class="icon"><use href="#i-logout"/></svg>Log out</button>
+      <div class="tb-actions">
+        <div class="menu-wrap">
+          <button type="button" id="bell" class="icon-btn" aria-label="Alerts" aria-expanded="false"><svg class="icon"><use href="#i-bell"/></svg><span id="bell-dot" class="dot" hidden></span></button>
+          <div id="bell-menu" class="menu alerts" hidden>
+            <h3>Alerts <small class="muted">last 24 hours</small></h3>
+            <ul id="alerts-list"></ul>
+          </div>
+        </div>
+        <span class="tb-sep"></span>
+        <div class="menu-wrap">
+          <button type="button" id="account" class="account" aria-expanded="false">
+            <span class="avatar"><svg class="icon"><use href="#i-user"/></svg></span>
+            <span id="account-name">Admin</span>
+            <svg class="icon chevron"><use href="#i-chevron"/></svg>
+          </button>
+          <div id="account-menu" class="menu" hidden>
+            <a href="/"><svg class="icon"><use href="#i-home"/></svg>Home screen</a>
+            <a href="#contact"><svg class="icon"><use href="#i-mail"/></svg>Contact developer</a>
+            <a href="#security"><svg class="icon"><use href="#i-shield"/></svg>Security &amp; privacy</a>
+            <button id="logout" type="button"><svg class="icon"><use href="#i-logout"/></svg>Log out</button>
+          </div>
+        </div>
       </div>
-    </aside>
+    </header>
 
     <main class="main">
       <!-- 1. Dashboard -->
       <section id="sec-dashboard" class="section">
-        <h1>Dashboard</h1>
-        <div class="card clock-card">
-          <svg class="icon"><use href="#i-calendar"/></svg>
-          <div><div id="dash-date" class="dash-date">&nbsp;</div><div id="dash-time" class="dash-time tabular">&nbsp;</div></div>
+        <div class="page-head">
+          <div><h1>Dashboard</h1><p class="sub">Overview of library activity and current status.</p></div>
+          <div class="date-pill">
+            <svg class="icon"><use href="#i-calendar"/></svg>
+            <div><b id="dash-date">&nbsp;</b><span id="dash-time" class="tabular">&nbsp;</span></div>
+          </div>
+        </div>
+        <div class="hero">
+          <div class="hero-text">
+            <h2>Poornima University<br>Library Admin</h2>
+            <span class="hero-rule"></span>
+          </div>
         </div>
         <div class="kpis">
-          <div class="card kpi"><span>People inside now</span><b id="kpi-inside">–</b></div>
-          <div class="card kpi"><span>Entries today</span><b id="kpi-today">–</b></div>
-          <div class="card kpi"><span>Peak hour today</span><b id="kpi-peak">–</b></div>
-          <div class="card kpi"><span>Library timings</span><b id="kpi-timings">–</b></div>
+          <div class="kpi kpi-blue"><svg class="icon"><use href="#i-users"/></svg><div><span>People inside now</span><b id="kpi-inside">–</b></div></div>
+          <div class="kpi kpi-pink"><svg class="icon"><use href="#i-enter"/></svg><div><span>Entries today</span><b id="kpi-today">–</b></div></div>
+          <div class="kpi kpi-gold"><svg class="icon"><use href="#i-bars"/></svg><div><span>Peak hour today</span><b id="kpi-peak">–</b></div></div>
+          <div class="kpi kpi-purple"><svg class="icon"><use href="#i-clock"/></svg><div><span>Library timings</span><b id="kpi-timings">–</b></div></div>
         </div>
-        <p id="stats" class="muted"></p>
+        <p id="stats" class="muted small"></p>
       </section>
 
       <!-- 2. Entry Analytics -->
@@ -302,6 +326,16 @@
         </div>
       </section>
     </main>
+
+    <nav class="bottom-nav" id="nav" aria-label="Sections">
+      <a href="#dashboard" data-section="dashboard"><svg class="icon"><use href="#i-grid"/></svg><span>Dashboard</span></a>
+      <a href="#analytics" data-section="analytics"><svg class="icon"><use href="#i-chart"/></svg><span>Analytics</span></a>
+      <a href="#reports" data-section="reports"><svg class="icon"><use href="#i-file"/></svg><span>Reports</span></a>
+      <a href="#share" data-section="share"><svg class="icon"><use href="#i-send"/></svg><span>Share</span></a>
+      <a href="#backups" data-section="backups"><svg class="icon"><use href="#i-db"/></svg><span>Backups</span></a>
+      <a href="#members" data-section="members"><svg class="icon"><use href="#i-users"/></svg><span>Members</span></a>
+      <a href="#security" data-section="security" data-also="contact"><svg class="icon"><use href="#i-gear"/></svg><span>Settings</span></a>
+    </nav>
   </div>
 
   <dialog id="dialog" class="dialog">

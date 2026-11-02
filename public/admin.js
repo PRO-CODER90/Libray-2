@@ -116,6 +116,7 @@ function showApp(loggedIn) {
   appView.hidden = !loggedIn;
   if (loggedIn) {
     loadConfig();
+    loadAlerts();
     showSection(location.hash.slice(1) || 'dashboard');
   }
 }
@@ -174,16 +175,59 @@ const loaders = {
 function showSection(name) {
   if (!document.getElementById(`sec-${name}`)) name = 'dashboard';
   document.querySelectorAll('.section').forEach((s) => { s.hidden = s.id !== `sec-${name}`; });
-  document.querySelectorAll('#nav a').forEach((a) => a.classList.toggle('active', a.dataset.section === name));
+  document.querySelectorAll('#nav a').forEach((a) => a.classList.toggle('active', a.dataset.section === name || a.dataset.also === name));
+  closeMenus();
+  window.scrollTo(0, 0);
   loaders[name]?.();
 }
 
 window.addEventListener('hashchange', () => { if (!appView.hidden) showSection(location.hash.slice(1)); });
 
+// ---- Header menus and alerts ----
+
+const menus = [['bell', 'bell-menu'], ['account', 'account-menu']];
+function closeMenus() {
+  for (const [btn, menu] of menus) { $(menu).hidden = true; $(btn).setAttribute('aria-expanded', 'false'); }
+}
+for (const [btn, menu] of menus) {
+  $(btn).addEventListener('click', (e) => {
+    e.stopPropagation();
+    const open = $(menu).hidden;
+    closeMenus();
+    $(menu).hidden = !open;
+    $(btn).setAttribute('aria-expanded', String(open));
+    if (open && btn === 'bell') $('bell-dot').hidden = true;
+  });
+}
+document.addEventListener('click', (e) => { if (!e.target.closest('.menu')) closeMenus(); });
+document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeMenus(); });
+
+const ALERT_LABELS = {
+  login_fail: 'Failed admin login', login_locked: 'Admin login locked', backup_fail: 'Backup failed',
+  restore: 'Backup restored', restore_fail: 'Restore failed', report_email_fail: 'Report email failed',
+  share_fail: 'Report share failed', password_change: 'Admin password changed', password_change_fail: 'Wrong current password',
+};
+
+// Security and failure events from the audit log in the last 24 hours.
+async function loadAlerts() {
+  const { ok, body } = await adminApi('/api/admin/audit');
+  if (!ok) return;
+  const since = new Date(Date.now() + clockOffset - 86400000);
+  const sinceStr = `${since.toLocaleDateString('en-CA', { timeZone: TZ })} ${since.toLocaleTimeString('en-GB', { timeZone: TZ })}`;
+  const alerts = body.filter((r) => ALERT_LABELS[r.action] && r.at >= sinceStr);
+  $('bell-dot').hidden = alerts.length === 0;
+  $('alerts-list').replaceChildren(...(alerts.length
+    ? alerts.slice(0, 12).map((r) => el('li', {},
+      el('b', { textContent: ALERT_LABELS[r.action] }),
+      el('span', { className: 'muted', textContent: `${r.at.slice(11, 16)} · ${r.detail || r.ip || ''}` })))
+    : [el('li', { className: 'muted', textContent: 'Nothing needs attention.' })]));
+}
+setInterval(() => { if (!appView.hidden) loadAlerts(); }, 5 * 60000);
+
 // ---- 1. Dashboard ----
 
 let clockOffset = 0;
-const dateFmt = new Intl.DateTimeFormat('en-IN', { timeZone: TZ, weekday: 'long', day: 'numeric', month: 'short', year: 'numeric' });
+const dateFmt = new Intl.DateTimeFormat('en-IN', { timeZone: TZ, weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
 const timeFmt = new Intl.DateTimeFormat('en-IN', { timeZone: TZ, hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true });
 
 function tickClock() {
